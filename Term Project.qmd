@@ -6,7 +6,7 @@ editor: source
 format: 
   html:
     self-contained: true
-    code-fold: true
+    code-fold: false
     code-tools: true
     toc: true
 execute: 
@@ -16,7 +16,73 @@ execute:
   error: true
 ---
 
-```{r}
+## Environment Setup & Data Import
 
+```{r setup}
+#| message: FALSE
+library(tidyverse)
+library(here)
+library(readr)
+library(purrr)
 ```
 
+```{r data import}
+#| message: FALSE
+murder_RAW <- read_csv(here::here("murder_per_100000_people.csv"))
+SDI_RAW <- read_csv(here::here("sdi.csv"))
+```
+
+## Data Preparation
+
+Initial separate data treatment to adjust dataframes to the same column dimensions.
+
+```{r}
+murder <- murder_RAW |> 
+  select("country", "1989":"2006") |> 
+  mutate(data_type = "Murder Rate per 100K") |> 
+  relocate(data_type, .after = country)
+```
+
+```{r}
+SDI <- SDI_RAW |> 
+  select("country", "1989":"2006") |> 
+  mutate(data_type = "Sustainable Development Index") |> 
+  relocate(data_type, .after = country)
+```
+
+Both dataframes stacked for further treatment.
+
+```{r}
+data_RAW <- rbind(murder, SDI)
+```
+
+```{r}
+data_RAW <- data_RAW |> 
+  rowwise() |> 
+  mutate(NA_percent = sum(is.na(across(everything())))/length(across("1989":"2006"))) |>  # Remove all rows with more than 10% NAs
+  filter(NA_percent < 0.15 | country == "United States") |>                               # Remove all rows with more than 10% NAs
+  ungroup() |> 
+  group_by(country) |>                                # remove countries that don't have murder rate and SDI info
+  filter(n() > 1 | country == "United States") |>     # remove countries that don't have murder rate and SDI info
+  ungroup() |> 
+  arrange(country)
+```
+
+::: callout-warning
+### Country Selection
+
+Here is the list of eligible countries for analysis, spanning from 1989 to 2006 (the last year where the US has data). if we choose not to analyze the US, then this data set could be extended to the early/mid 2010s since most of these countries have datapoints in that time period.
+
+```{r}
+data_RAW |> 
+  distinct(country) |> 
+  pull(country)
+```
+:::
+
+```{r}
+# select_countries <- c("United States")  # Final list of countries chosen for analysis
+# 
+# data <- data_RAW |>
+#   filter(country %in% select_countries)
+```
