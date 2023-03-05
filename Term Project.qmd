@@ -81,7 +81,7 @@ data_RAW |>
 :::
 
 ```{r}
-# select_countries <- c("United States")  # Final list of countries chosen for analysis
+select_countries <- c("United States", "Australia", "Germany", "Singapore", "Japan")  # Final list of countries chosen for analysis
 # 
 # data <- data_RAW |>
 #   filter(country %in% select_countries)
