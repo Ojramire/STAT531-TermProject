@@ -1,12 +1,12 @@
 ---
-title: "Term Project"
+title: "Is Sustainable Development linked to Reduced Murder Rates?"
 author: "Grace Damaschino, Tyler Lopez, Oriana Ramirez, Daniel Seiler"
 self-contained: true
 editor: source
 format: 
   html:
     self-contained: true
-    code-fold: false
+    code-fold: true
     code-tools: true
     toc: true
 execute: 
@@ -16,78 +16,7 @@ execute:
   error: true
 ---
 
-## Environment Setup & Data Import
-
-```{r setup}
-#| message: FALSE
-library(tidyverse)
-library(here)
-library(readr)
-library(purrr)
-```
-
-```{r data import}
-#| message: FALSE
-murder_RAW <- read_csv(here::here("murder_per_100000_people.csv"))
-SDI_RAW <- read_csv(here::here("sdi.csv"))
-```
-
-## Data Preparation
-
-Initial separate data treatment to adjust dataframes to the same column dimensions.
-
-```{r}
-murder <- murder_RAW |> 
-  select("country", "1989":"2006") |> 
-  mutate(data_type = "Murder Rate per 100K") |> 
-  relocate(data_type, .after = country)
-```
-
-```{r}
-SDI <- SDI_RAW |> 
-  select("country", "1989":"2006") |> 
-  mutate(data_type = "Sustainable Development Index") |> 
-  relocate(data_type, .after = country)
-```
-
-Both dataframes stacked for further treatment.
-
-```{r}
-data_RAW <- rbind(murder, SDI)
-```
-
-```{r}
-data_RAW <- data_RAW |> 
-  rowwise() |> 
-  mutate(NA_percent = sum(is.na(across(everything())))/length(across("1989":"2006"))) |>  # Remove all rows with more than 10% NAs
-  filter(NA_percent < 0.15 | country == "United States") |>                               # Remove all rows with more than 10% NAs
-  ungroup() |> 
-  group_by(country) |>                                # remove countries that don't have murder rate and SDI info
-  filter(n() > 1 | country == "United States") |>     # remove countries that don't have murder rate and SDI info
-  ungroup() |> 
-  arrange(country)
-```
-
-::: callout-warning
-### Country Selection
-
-Here is the list of eligible countries for analysis, spanning from 1989 to 2006 (the last year where the US has data). if we choose not to analyze the US, then this data set could be extended to the early/mid 2010s since most of these countries have datapoints in that time period.
-
-```{r}
-data_RAW |> 
-  distinct(country) |> 
-  pull(country)
-```
-:::
-
-```{r}
-select_countries <- c("United States", "Australia", "Germany", "Singapore", "Japan")  # Final list of countries chosen for analysis
-# 
-data <- data_RAW |>
-  filter(country %in% select_countries)
-```
-
-Data info:
+## Introduction
 
 Our analysis will be on the relationship between the murder rate and the sustainability development index in multiple countries throughout the world. Two quantitative datasets titled Murders (per 100,000 people) and Sustainable Development Index were found on Gapminder. The Murders (per 100,000 people) dataset contains information on mortality per 100,000 people for 118 countries between 1949 to 2015. The mortality rate was adjusted by standard population and age so that all countries in the dataset have the same age composition of the population. The Sustainable Development Index dataset contains an efficiency metric for 165 countries between 1989 to 2018. The Sustainability Development Index (SDI) is a metric based on a Human Development Index (HDI) and an Ecological Impact Index. The human development index is the geometric mean of life expectancy, education, and modified income indices (Figure 1), while the ecological impact index (Figure 2) is based on the "extent to which consumption-based CO2 emissions and material footprint exceed per-capita shares of planetary boundaries" (Sustainable Development Index, 2019).
 
@@ -99,11 +28,113 @@ Figure 1. HDI formula based on the geometric mean of life expectancy, education,
 
 Figure 2. Ecological Impact Index formula based on the Average Overshoot (AO) of material footprint (MF) and CO2 emissions.
 
-Hypothesis:
+### Hypothesis
 
 We would hypothesize that the sustainability development index is strongly negatively correlated with murder rate, due to the wide variety of factors (as discussed above) that play into the sustainable development index. The sustainable development index is as much a measure of well-being and progress as it is sustainability, as a result of this we would expect a rise in murder rate to correspond with a drop in SDI. In terms of limitations of our regression model, we would also hypothesize that due to the wide net cast by the sustainable development index, there may be significant confounding variables or even possible redundancies limiting the applications of this analysis. For instance, SDI is calculated in large part from HDI, HDI incorporates life expectancy into their data, and a high murder rate would result in some reduction of life expectancy, thus reducing the SDI ranking directly.
 
-**References:** 
+## Data Selection and Manipulation
+
+```{r setup}
+#| message: FALSE
+library(tidyverse)
+library(here)
+library(readr)
+library(purrr)
+library(DT)
+
+#| message: FALSE
+murder_RAW <- read_csv(here::here("murder_per_100000_people.csv"))
+SDI_RAW <- read_csv(here::here("sdi.csv"))
+```
+
+```{r}
+#Initial separate data treatment to adjust dataframes to the same column dimensions.
+
+murder <- murder_RAW |> 
+  select("country", "1989":"2006") |> 
+  pivot_longer(cols = "1989":"2006",
+               names_to = "year",
+               values_to = "Murder Rate per 100K")|>
+  mutate(year = as.numeric(year))
+
+SDI <- SDI_RAW |> 
+  select("country", "1989":"2006") |> 
+  pivot_longer(cols = "1989":"2006",
+               names_to = "year",
+               values_to = "Sustainable Development Index")|>
+  mutate(year = as.numeric(year))
+
+#Both dataframes joined for further treatment.
+
+data_RAW <- inner_join(murder, SDI)
+```
+
+```{r}
+data_opt <- data_RAW |>
+  group_by(country) |>
+  mutate(NA_percent = sum(is.na(across("Murder Rate per 100K":"Sustainable Development Index")))/36) |>
+
+# Remove all countries with more than 10% NAs
+  filter(NA_percent < 0.1)
+```
+
+::: callout-warning
+
+### Country Selection
+
+Here is the list of eligible countries for analysis, spanning from 1989 to 2006 (the last year where the US has data). if we choose not to analyze the US, then this data set could be extended to the early/mid 2010s since most of these countries have datapoints in that time period.
+
+```{r}
+data_opt |> 
+  distinct(country) |> 
+  pull(country)
+```
+:::
+
+```{r}
+select_countries <- c("United States", "Australia", "Germany", "Singapore", "Japan")  # Final list of countries chosen for analysis
+# 
+data_clean <- data_opt |>
+  filter(country %in% select_countries) |>
+  select(country:"Sustainable Development Index")
+datatable(data_clean, class = 'cell-border stripe', rownames = FALSE)
+```
+
+## Regression Analysis
+### Data Visualization
+
+```{r}
+data_clean |>
+  ggplot(aes(x = `Sustainable Development Index`, y = `Murder Rate per 100K`)) +
+  geom_point(aes(color = fct_reorder(country, `Murder Rate per 100K`, .desc = TRUE))) +
+  labs(x = "Sustainable Development Index (SDI)", y = "", subtitle = "Murder Rate per 100K", title = "Relationship between SDI and Murder Rate per 100k for 5 Countries") +
+  guides(color = guide_legend(title = "Country"))
+```
+
+```{r}
+fig.align = 'center' 
+library(patchwork)
+
+SDI_plot <- data_clean |>
+  ggplot(aes(x = year, y = `Sustainable Development Index`)) +
+  geom_point(aes(color = fct_reorder(country, `Murder Rate per 100K`, .desc = TRUE))) +
+  labs(x = "Year", y = "", subtitle = "Sustainable Development Index \n(SDI)") +
+  theme(legend.position = "none")
+
+murder_plot <- data_clean |>
+  ggplot(aes(x = year, y = `Murder Rate per 100K`)) +
+  geom_point(aes(color = fct_reorder(country, `Murder Rate per 100K`, .desc = TRUE))) +
+  labs(x = "Year", y = "", subtitle = "Murder Rate per 100K") +
+  guides(color = guide_legend(title = "Country"))
+
+SDI_plot + murder_plot
+```
+
+### Linear Regression
+
+### Model Fit
+
+## References:
 
 Sustainable Development Index. (2019). Gapminder. <https://www.gapminder.org/data/> 
 
