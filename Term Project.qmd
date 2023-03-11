@@ -132,6 +132,7 @@ SDI_plot + murder_plot
 
 ### Linear Regression
 ```{r}
+#| fig-height: 16
 totalcountry_lm <- lm(`Murder Rate per 100K` ~ `Sustainable Development Index`,
                     data = data_clean
                     )
@@ -161,44 +162,59 @@ data_japan <- data_clean |>
 japan_lm <- lm(`Murder Rate per 100K` ~ `Sustainable Development Index`,
                     data = data_japan)
 
+# United States plot
 us_plot_lm <- data_us |> 
 ggplot(aes(x = `Sustainable Development Index`, 
            y = `Murder Rate per 100K`)
        ) +
-  geom_point() +
-  geom_smooth(method = "lm")
+  geom_point(color = "darkblue") +
+  geom_smooth(method = "lm",
+              color = "black") + 
+  labs(title = "United States")
 
+# Australia Plot
 australia_plot_lm <- data_australia |> 
 ggplot(aes(x = `Sustainable Development Index`, 
            y = `Murder Rate per 100K`)
        ) +
-  geom_point() +
-  geom_smooth(method = "lm")
+  geom_point(color = 'forestgreen') +
+  geom_smooth(method = "lm",
+              color = 'black') + 
+  labs(title = "Australia")
 
+# Germany Plot
 germany_plot_lm <- data_germany |> 
 ggplot(aes(x = `Sustainable Development Index`, 
            y = `Murder Rate per 100K`)
        ) +
-  geom_point() +
-  geom_smooth(method = "lm")
+  geom_point(color = 'darkorange') +
+  geom_smooth(method = "lm",
+              color = 'black') + 
+  labs(title = 'Germany')
 
+# Singapore Plot
 singapore_plot_lm <- data_singapore |> 
 ggplot(aes(x = `Sustainable Development Index`, 
            y = `Murder Rate per 100K`)
        ) +
-  geom_point() +
-  geom_smooth(method = "lm")
+  geom_point(color = "purple") +
+  geom_smooth(method = "lm",
+              color = 'black') + 
+  labs(title = 'Singapore')
 
+# Japan Plot
 japan_plot_lm <- data_japan |> 
 ggplot(aes(x = `Sustainable Development Index`, 
            y = `Murder Rate per 100K`)
        ) +
-  geom_point() +
-  geom_smooth(method = "lm")
+  geom_point(color = 'maroon') +
+  geom_smooth(method = "lm",
+              color = 'black') + 
+  labs(title = 'Japan')
 
 
 library(patchwork)
-us_plot_lm + australia_plot_lm + germany_plot_lm + singapore_plot_lm + japan_plot_lm
+us_plot_lm / australia_plot_lm / germany_plot_lm / singapore_plot_lm / japan_plot_lm
 
 ```
 
