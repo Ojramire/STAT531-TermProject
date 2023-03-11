@@ -212,9 +212,18 @@ ggplot(aes(x = `Sustainable Development Index`,
               color = 'black') + 
   labs(title = 'Japan')
 
+totalcountry_plot_lm <- data_clean |>
+  ggplot(aes(x = `Sustainable Development Index`, 
+           y = `Murder Rate per 100K`)
+       ) +
+  geom_point(aes(color = country)) +
+  geom_smooth(method = "lm",
+              color = 'black') + 
+  labs(title = 'All Countries')
+
 
 library(patchwork)
-us_plot_lm / australia_plot_lm / germany_plot_lm / singapore_plot_lm / japan_plot_lm
+us_plot_lm / australia_plot_lm / germany_plot_lm / singapore_plot_lm / japan_plot_lm / totalcountry_plot_lm
 
 ```
 
