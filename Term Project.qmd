@@ -131,6 +131,76 @@ SDI_plot + murder_plot
 ```
 
 ### Linear Regression
+```{r}
+totalcountry_lm <- lm(`Murder Rate per 100K` ~ `Sustainable Development Index`,
+                    data = data_clean
+                    )
+
+data_us <- data_clean |>
+  filter(country == "United States")
+us_lm <- lm(`Murder Rate per 100K` ~ `Sustainable Development Index`,
+                    data = data_us)
+
+data_australia <- data_clean |>
+  filter(country == "Australia")
+australia_lm <- lm(`Murder Rate per 100K` ~ `Sustainable Development Index`,
+                    data = data_australia)
+
+data_germany <- data_clean |>
+  filter(country == "Germany")
+germany_lm <- lm(`Murder Rate per 100K` ~ `Sustainable Development Index`,
+                    data = data_germany)
+
+data_singapore <- data_clean |>
+  filter(country == "Singapore")
+singapore_lm <- lm(`Murder Rate per 100K` ~ `Sustainable Development Index`,
+                    data = data_singapore)
+
+data_japan <- data_clean |>
+  filter(country == "Japan")
+japan_lm <- lm(`Murder Rate per 100K` ~ `Sustainable Development Index`,
+                    data = data_japan)
+
+us_plot_lm <- data_us |> 
+ggplot(aes(x = `Sustainable Development Index`, 
+           y = `Murder Rate per 100K`)
+       ) +
+  geom_point() +
+  geom_smooth(method = "lm")
+
+australia_plot_lm <- data_australia |> 
+ggplot(aes(x = `Sustainable Development Index`, 
+           y = `Murder Rate per 100K`)
+       ) +
+  geom_point() +
+  geom_smooth(method = "lm")
+
+germany_plot_lm <- data_germany |> 
+ggplot(aes(x = `Sustainable Development Index`, 
+           y = `Murder Rate per 100K`)
+       ) +
+  geom_point() +
+  geom_smooth(method = "lm")
+
+singapore_plot_lm <- data_singapore |> 
+ggplot(aes(x = `Sustainable Development Index`, 
+           y = `Murder Rate per 100K`)
+       ) +
+  geom_point() +
+  geom_smooth(method = "lm")
+
+japan_plot_lm <- data_japan |> 
+ggplot(aes(x = `Sustainable Development Index`, 
+           y = `Murder Rate per 100K`)
+       ) +
+  geom_point() +
+  geom_smooth(method = "lm")
+
+
+library(patchwork)
+us_plot_lm + australia_plot_lm + germany_plot_lm + singapore_plot_lm + japan_plot_lm
+
+```
 
 ### Model Fit
 
