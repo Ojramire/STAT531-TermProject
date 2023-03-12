@@ -272,31 +272,33 @@ Total Regression Equation:
 $$
 \hat{y}_{Murder Rate}=-0.04515x_{SDI}+3.94729
 $$
-
+For the total data, every unit increase in Sustainable Development Index results in a 0.04515 decrease in murder rate.  Based on the intercept, with a SDI of 0, the murder rate would be around 3.94729 per 100k people.
 US Regression Equation
 $$
 \hat{y}_{Murder Rate}=0.2016x_{SDI}+2.5978
 $$
-
+For the US data, every unit increase in Sustainable Development Index results in a 0.2016 increase in murder rate.  Based on the intercept, with a SDI of 0, the murder rate would be around 2.5978 per 100k people.
 
 Australia Regression Equation
 $$
 \hat{y}_{Murder Rate}=0.04889x_{SDI}+0.27391
 $$
+For the Australia data, every unit increase in Sustainable Development Index results in a 0.04889 increase in murder rate.  Based on the intercept, with a SDI of 0, the murder rate would be around 0.27391 per 100k people.
 Germany Regression Equation
 $$
 \hat{y}_{Murder Rate}=0.04798x_{SDI}-2.08016
 $$
+For the Germany  data, every unit increase in Sustainable Development Index results in a 0.04798 increase in murder rate.  Based on the intercept, with a SDI of 0, the murder rate would be around negative 2.08016 per 100k people, which is of course an  impossible value.
 Singapore Regression Equation
 $$
 \hat{y}_{Murder Rate}=0.02891 x_{SDI}-0.28529
 $$
+For the Singapore data, every unit increase in Sustainable Development Index results in a 0.02891 increase in murder rate.  Based on the intercept, with a SDI of 0, the murder rate would be around -0.28529 per 100k people, which is of course.
 Japan Regression Equation
 $$
 \hat{y}_{Murder Rate}=0.005984x_{SDI}-0.231561
 $$
-
-\hat{y}_{Murder Rate}=-0.04515x_{SDI}+3.94729
+For the Japan data, every unit increase in Sustainable Development Index results in a 0.005984 increase in murder rate.  Based on the intercept, with a SDI of 0, the murder rate would be around -0.231561 per 100k people, which again is impossible.
 ### Model Fit
 ```{r}
 library(broom)
@@ -446,7 +448,7 @@ kable(x=Variability, col.names=Column_names) %>%
 ```
 
 
-Our residual variance for our model (totalcountry_lm) is 7.62. When you then divide the residual variance (7.62) over the response variance (8.25), you get 92.36. This is the amount of unexplained variability in Murders that is not accounted for by SDI in the model. This indicates that the model is doing a poor job of explaining the variability in the response variable.
+Our residual variance for our model (totalcountry_lm) is 7.62. When you then divide the residual variance (7.62) over the response variance (8.25), you get 92.36%. This is the amount of unexplained variability in Murders that is not accounted for by SDI in the model. This indicates that the model is doing a poor job of explaining the variability in the response variable.
 
 
 To check this, we also observed the R-squared value, which is proportion of the variability in our response variable (Murder Rate per 100K in these 5 countries) that is accounted for by our regression model (totalcountry_lm), which came out to be 0.0761. So, 7.61% of the variation in Murders per 100K people in these 5 countries can be explained by the Sustainable Development Index (SDI) for the countries, while the remaining 92.39% is due to other factors or random variation. This further suggests that our model is low quality, and that the SDI does not explain the variability in Murders per 100K very well.
