@@ -388,11 +388,11 @@ augment_sing <- augment(singapore_lm)
 augment_jp <- augment(japan_lm)
 
 Regression <- c("Total", "United States", "Australia", "Germany", "Singapore", "Japan")
-Response_variability <- c(var(augment_total$`Sustainable Development Index`), var(augmentus$`Sustainable Development Index`), var(augmentaus$`Sustainable Development Index`), var(augment_ger$`Sustainable Development Index`), var(augment_sing$`Sustainable Development Index`), var(augment_jp$`Sustainable Development Index`))
+Response_variability <- c(var(augment_total$`Sustainable Development Index`), var(augment_us$`Sustainable Development Index`), var(augment_aus$`Sustainable Development Index`), var(augment_ger$`Sustainable Development Index`), var(augment_sing$`Sustainable Development Index`), var(augment_jp$`Sustainable Development Index`))
 
-Fitted_variability <- c(var(augment_total$.fitted), var(augmentus$.fitted), var(augmentaus$.fitted), var(augment_ger$.fitted), var(augment_sing$.fitted), var(augment_jp$.fitted))
+Fitted_variability <- c(var(augment_total$.fitted), var(augment_us$.fitted), var(augment_aus$.fitted), var(augment_ger$.fitted), var(augment_sing$.fitted), var(augment_jp$.fitted))
 
-residual_variability <- c(var(augment_total$.resid), var(augmentus$.resid), var(augmentaus$.resid), var(augment_ger$.resid), var(augment_sing$.resid), var(augment_jp$.resid))
+residual_variability <- c(var(augment_total$.resid), var(augment_us$.resid), var(augment_aus$.resid), var(augment_ger$.resid), var(augment_sing$.resid), var(augment_jp$.resid))
 
 Variability <- data.frame(Regression, Response_variability, Fitted_variability, residual_variability)
 
@@ -404,11 +404,12 @@ kable(x=Variability, col.names=Column_names) %>%
 
 ```
 
-
-## References:
 # Discuss the proportion of the variability in the response values that was accounted for by your regression model. What does this suggest about the “quality” of your model?
 
 The proportion of the variability in our response value (Murder Rate per 100K in these 5 countries) that is accounted for by our regression model (totalcountry_lm) is the resulting R-squared value of 0.0761. So, 7.61% of the variation in Murders per 100K people in these 5 countries can be explained by the Sustainable Development Index (SDI) for the countries, while the remaining 92.39% is due to other factors or random variation. This suggests that our model is low quality, and that the SDI does not explain the variability in Murders per 100K very well.
+
+## References:
+
 Sustainable Development Index. (2019). Gapminder. <https://www.gapminder.org/data/> 
 
 Methodology and Data. (n.d.). SUSTAINABLE DEVELOPMENT INDEX. <https://www.sustainabledevelopmentindex.org/methods.> 
