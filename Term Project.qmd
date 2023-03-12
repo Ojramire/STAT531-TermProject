@@ -330,7 +330,53 @@ anova_table_total_clean <- anova_table_total |>
          "P-Value" = "p.value") |>
   mutate(RMSE = sqrt(`Mean Squared Error`)) 
 
+totalcountry_lm %>% 
+  augment() %>% 
+  ggplot(aes(x=.fitted, y=.resid))+
+  geom_point()+
+  geom_hline(yintercept=0, linetype=2)+
+  scale_y_continuous(limits=c(-8, 8))+
+  labs(x="Fitted Values", y="", subtitle="Residuals", title="Residuals versus Fitted Values for Total Linear Regression")
 
+us_lm %>% 
+  augment() %>% 
+  ggplot(aes(x=.fitted, y=.resid))+
+  geom_point()+
+  geom_hline(yintercept=0, linetype=2)+
+  scale_y_continuous(limits=c(-0.75, 0.75))+
+  labs(x="Fitted Values", y="", subtitle="Residuals", title="Residuals versus Fitted Values for US Linear Regression")
+
+australia_lm %>% 
+  augment() %>% 
+  ggplot(aes(x=.fitted, y=.resid))+
+  geom_point()+
+  geom_hline(yintercept=0, linetype=2)+
+  scale_y_continuous(limits=c(-0.5, 0.5))+
+  labs(x="Fitted Values", y="", subtitle="Residuals", title="Residuals versus Fitted Values for Australia Linear Regression")
+
+germany_lm %>% 
+  augment() %>% 
+  ggplot(aes(x=.fitted, y=.resid))+
+  geom_point()+
+  geom_hline(yintercept=0, linetype=2)+
+  scale_y_continuous(limits=c(-0.3, 0.3))+
+  labs(x="Fitted Values", y="", subtitle="Residuals", title="Residuals versus Fitted Values for Germany Linear Regression")
+
+singapore_lm %>% 
+  augment() %>% 
+  ggplot(aes(x=.fitted, y=.resid))+
+  geom_point()+
+  geom_hline(yintercept=0, linetype=2)+
+  scale_y_continuous(limits=c(-0.5, 0.5))+
+  labs(x="Fitted Values", y="", subtitle="Residuals", title="Residuals versus Fitted Values for Singapore Linear Regression")
+
+japan_lm %>% 
+  augment() %>% 
+  ggplot(aes(x=.fitted, y=.resid))+
+  geom_point()+
+  geom_hline(yintercept=0, linetype=2)+
+  scale_y_continuous(limits=c(-0.2, 0.2))+
+  labs(x="Fitted Values", y="", subtitle="Residuals", title="Residuals versus Fitted Values for Japan Linear Regression")
 
 ```
 ## References:
