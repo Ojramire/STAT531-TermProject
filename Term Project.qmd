@@ -264,11 +264,39 @@ totalcountry_plot_lm <- data_clean |>
 
 us_plot_lm / australia_plot_lm / germany_plot_lm / singapore_plot_lm / japan_plot_lm / totalcountry_plot_lm
 
+
 ```
 
 We used a simple linear regression to plot the correlation between the Sustainable Development Index and Murder Rate per 100K for each of the five countries both individually and in conjunction. 
+Total Regression Equation:
+$$
+\hat{y}_{Murder Rate}=-0.04515x_{SDI}+3.94729
+$$
+
+US Regression Equation
+$$
+\hat{y}_{Murder Rate}=0.2016x_{SDI}+2.5978
+$$
 
 
+Australia Regression Equation
+$$
+\hat{y}_{Murder Rate}=0.04889x_{SDI}+0.27391
+$$
+Germany Regression Equation
+$$
+\hat{y}_{Murder Rate}=0.04798x_{SDI}-2.08016
+$$
+Singapore Regression Equation
+$$
+\hat{y}_{Murder Rate}=0.02891 x_{SDI}-0.28529
+$$
+Japan Regression Equation
+$$
+\hat{y}_{Murder Rate}=0.005984x_{SDI}-0.231561
+$$
+
+\hat{y}_{Murder Rate}=-0.04515x_{SDI}+3.94729
 ### Model Fit
 ```{r}
 library(broom)
