@@ -117,18 +117,23 @@ fig.align = 'center'
 
 SDI_plot <- data_clean |>
   ggplot(aes(x = year, y = `Sustainable Development Index`)) +
-  geom_point(aes(color = fct_reorder(country, `Murder Rate per 100K`, .desc = TRUE))) +
+  geom_line(aes(color = fct_reorder(country, `Murder Rate per 100K`, .desc = TRUE))) +
   labs(x = "Year", y = "", subtitle = "Sustainable Development Index \n(SDI)") +
   theme(legend.position = "none")
 
 murder_plot <- data_clean |>
   ggplot(aes(x = year, y = `Murder Rate per 100K`)) +
-  geom_point(aes(color = fct_reorder(country, `Murder Rate per 100K`, .desc = TRUE))) +
+  geom_line(aes(color = fct_reorder(country, `Murder Rate per 100K`, .desc = TRUE))) +
   labs(x = "Year", y = "", subtitle = "Murder Rate per 100K") +
   guides(color = guide_legend(title = "Country"))
 
 SDI_plot + murder_plot
 ```
+
+From the first graph above, we can see that there is a moderate-strong positive relationship between our variables, meaning that for the US, as the sustainable development index (SDI) increases, so do murder rates. For the other four countries, there is also a positive relationship between our response and explanatory variables, however it is a much weaker relationship for these countries. This positive relationship is interesting, because initially we predicted a negative relationship, as SDI increases, murder rates should be going down. 
+
+Regarding the two line graphs above, we can see that both SDI and murder rates have been going down for each country over the years. This is also interesting to see because, again, we would expect that murder rates might be rising as SDI has been decreasing, but this is not the case that we are observing here. 
+
 
 ### Linear Regression
 ```{r}
@@ -260,6 +265,9 @@ totalcountry_plot_lm <- data_clean |>
 us_plot_lm / australia_plot_lm / germany_plot_lm / singapore_plot_lm / japan_plot_lm / totalcountry_plot_lm
 
 ```
+
+We used a simple linear regression to plot the correlation between the Sustainable Development Index and Murder Rate per 100K for each of the five countries both individually and in conjunction. 
+
 
 ### Model Fit
 ```{r}
@@ -408,8 +416,6 @@ kable(x=Variability, col.names=Column_names) %>%
 
 
 ```
-
-# Discuss the proportion of the variability in the response values that was accounted for by your regression model. What does this suggest about the “quality” of your model?
 
 
 Our residual variance for our model (totalcountry_lm) is 7.62. When you then divide the residual variance (7.62) over the response variance (8.25), you get 92.36. This is the amount of unexplained variability in Murders that is not accounted for by SDI in the model. This indicates that the model is doing a poor job of explaining the variability in the response variable.
