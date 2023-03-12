@@ -379,6 +379,31 @@ japan_lm %>%
   labs(x="Fitted Values", y="", subtitle="Residuals", title="Residuals versus Fitted Values for Japan Linear Regression")
 
 ```
+```{r}
+augment_total <- augment(totalcountry_lm)
+augment_us <- augment(us_lm)
+augment_aus <- augment(australia_lm)
+augment_ger <- augment(germany_lm)
+augment_sing <- augment(singapore_lm)
+augment_jp <- augment(japan_lm)
+
+Regression <- c("Total", "United States", "Australia", "Germany", "Singapore", "Japan")
+Response_variability <- c(var(augment_total$`Sustainable Development Index`), var(augmentus$`Sustainable Development Index`), var(augmentaus$`Sustainable Development Index`), var(augment_ger$`Sustainable Development Index`), var(augment_sing$`Sustainable Development Index`), var(augment_jp$`Sustainable Development Index`))
+
+Fitted_variability <- c(var(augment_total$.fitted), var(augmentus$.fitted), var(augmentaus$.fitted), var(augment_ger$.fitted), var(augment_sing$.fitted), var(augment_jp$.fitted))
+
+residual_variability <- c(var(augment_total$.resid), var(augmentus$.resid), var(augmentaus$.resid), var(augment_ger$.resid), var(augment_sing$.resid), var(augment_jp$.resid))
+
+Variability <- data.frame(Regression, Response_variability, Fitted_variability, residual_variability)
+
+Column_names <- c("Regression Model", "Response Variance", "Fitted Variance", "Residual Variance")
+library(kableExtra)
+kable(x=Variability, col.names=Column_names) %>% 
+  kable_classic_2()
+
+```
+
+
 ## References:
 
 Sustainable Development Index. (2019). Gapminder. <https://www.gapminder.org/data/> 
