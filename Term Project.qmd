@@ -262,7 +262,77 @@ us_plot_lm / australia_plot_lm / germany_plot_lm / singapore_plot_lm / japan_plo
 ```
 
 ### Model Fit
+```{r}
+library(broom)
+anova_table_us <- tidy(anova(us_lm))
+anova_table_us_clean <- anova_table_us |>
+  select(-statistic) |>
+  rename("Response Variable US" = "term",
+         "Degrees of Freedom" = "df",
+         "Sum of Squares" = "sumsq",
+         "Mean Squared Error" = "meansq",
+         "P-Value" = "p.value") |>
+  mutate(RMSE = sqrt(`Mean Squared Error`)) 
 
+
+
+anova_table_singapore <- tidy(anova(singapore_lm))
+anova_table_singapore_clean <- anova_table_singapore |>
+  select(-statistic) |>
+  rename("Response Variable Singapore" = "term",
+         "Degrees of Freedom" = "df",
+         "Sum of Squares" = "sumsq",
+         "Mean Squared Error" = "meansq",
+         "P-Value" = "p.value") |>
+  mutate(RMSE = sqrt(`Mean Squared Error`)) 
+
+
+anova_table_japan <- tidy(anova(japan_lm))
+anova_table_japan_clean <- anova_table_japan |>
+  select(-statistic) |>
+  rename("Response Variable Japan" = "term",
+         "Degrees of Freedom" = "df",
+         "Sum of Squares" = "sumsq",
+         "Mean Squared Error" = "meansq",
+         "P-Value" = "p.value") |>
+  mutate(RMSE = sqrt(`Mean Squared Error`)) 
+
+
+anova_table_germany <- tidy(anova(germany_lm))
+anova_table_germany_clean <- anova_table_germany |>
+  select(-statistic) |>
+  rename("Response Variable Germany" = "term",
+         "Degrees of Freedom" = "df",
+         "Sum of Squares" = "sumsq",
+         "Mean Squared Error" = "meansq",
+         "P-Value" = "p.value") |>
+  mutate(RMSE = sqrt(`Mean Squared Error`)) 
+
+
+anova_table_australia <- tidy(anova(australia_lm))
+anova_table_australia_clean <- anova_table_australia |>
+  select(-statistic) |>
+  rename("Response Variable Australia" = "term",
+         "Degrees of Freedom" = "df",
+         "Sum of Squares" = "sumsq",
+         "Mean Squared Error" = "meansq",
+         "P-Value" = "p.value") |>
+  mutate(RMSE = sqrt(`Mean Squared Error`)) 
+
+
+anova_table_total <- tidy(anova(totalcountry_lm))
+anova_table_total_clean <- anova_table_total |>
+  select(-statistic) |>
+  rename("Response Variable Total" = "term",
+         "Degrees of Freedom" = "df",
+         "Sum of Squares" = "sumsq",
+         "Mean Squared Error" = "meansq",
+         "P-Value" = "p.value") |>
+  mutate(RMSE = sqrt(`Mean Squared Error`)) 
+
+
+
+```
 ## References:
 
 Sustainable Development Index. (2019). Gapminder. <https://www.gapminder.org/data/> 
