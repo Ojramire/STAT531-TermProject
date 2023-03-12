@@ -39,8 +39,9 @@ We would hypothesize that the sustainability development index is strongly negat
 library(tidyverse)
 library(here)
 library(readr)
-library(purrr)
 library(DT)
+library(ggpubr)
+library(patchwork)
 
 #| message: FALSE
 murder_RAW <- read_csv(here::here("murder_per_100000_people.csv"))
@@ -113,7 +114,6 @@ data_clean |>
 
 ```{r}
 fig.align = 'center' 
-library(patchwork)
 
 SDI_plot <- data_clean |>
   ggplot(aes(x = year, y = `Sustainable Development Index`)) +
@@ -162,56 +162,86 @@ data_japan <- data_clean |>
 japan_lm <- lm(`Murder Rate per 100K` ~ `Sustainable Development Index`,
                     data = data_japan)
 
-# United States plot
+# United States plot ------------------------------ #
 us_plot_lm <- data_us |> 
 ggplot(aes(x = `Sustainable Development Index`, 
            y = `Murder Rate per 100K`)
        ) +
-  geom_point(color = "darkblue") +
+  geom_point(color = "#E76BF3") +
   geom_smooth(method = "lm",
               color = "black") + 
-  labs(title = "United States")
+  labs(title = "United States",
+       subtitle = "Murder Rate per 100K") + 
+  theme(axis.title.y = element_blank(),
+        plot.title.position = "plot") + 
+  stat_regline_equation(label.x = -Inf, label.y = Inf, vjust = 1.5, hjust = -0.1, size = 3) + 
+  stat_cor(label.x = -Inf, label.y = Inf, vjust = 3, hjust = -0.1, size = 3)
 
-# Australia Plot
+
+# Australia Plot ------------------------------ #
 australia_plot_lm <- data_australia |> 
 ggplot(aes(x = `Sustainable Development Index`, 
            y = `Murder Rate per 100K`)
        ) +
-  geom_point(color = 'forestgreen') +
+  geom_point(color = '#F8766D') +
   geom_smooth(method = "lm",
               color = 'black') + 
-  labs(title = "Australia")
+  labs(title = "Australia",
+       subtitle = "Murder Rate per 100K") + 
+  theme(axis.title.y = element_blank(),
+        plot.title.position = "plot") + 
+  stat_regline_equation(label.x = -Inf, label.y = Inf, vjust = 1.5, hjust = -0.1, size = 3) + 
+  stat_cor(label.x = -Inf, label.y = Inf, vjust = 3, hjust = -0.1, size = 3)
 
-# Germany Plot
+
+# Germany Plot ------------------------------ #
 germany_plot_lm <- data_germany |> 
 ggplot(aes(x = `Sustainable Development Index`, 
            y = `Murder Rate per 100K`)
        ) +
-  geom_point(color = 'darkorange') +
+  geom_point(color = '#A3A500') +
   geom_smooth(method = "lm",
               color = 'black') + 
-  labs(title = 'Germany')
+  labs(title = 'Germany',
+       subtitle = "Murder Rate per 100K") + 
+  theme(axis.title.y = element_blank(),
+        plot.title.position = "plot") + 
+  stat_regline_equation(label.x = -Inf, label.y = Inf, vjust = 1.5, hjust = -0.1, size = 3) + 
+  stat_cor(label.x = -Inf, label.y = Inf, vjust = 3, hjust = -0.1, size = 3)
 
-# Singapore Plot
+
+# Singapore Plot ------------------------------ #
 singapore_plot_lm <- data_singapore |> 
 ggplot(aes(x = `Sustainable Development Index`, 
            y = `Murder Rate per 100K`)
        ) +
-  geom_point(color = "purple") +
+  geom_point(color = "#00B0F6") +
   geom_smooth(method = "lm",
               color = 'black') + 
-  labs(title = 'Singapore')
+  labs(title = 'Singapore',
+       subtitle = "Murder Rate per 100K") + 
+  theme(axis.title.y = element_blank(),
+        plot.title.position = "plot") + 
+  stat_regline_equation(label.x = -Inf, label.y = Inf, vjust = 1.5, hjust = -0.1, size = 3) + 
+  stat_cor(label.x = -Inf, label.y = Inf, vjust = 3, hjust = -0.1, size = 3)
 
-# Japan Plot
+
+# Japan Plot ------------------------------ #
 japan_plot_lm <- data_japan |> 
 ggplot(aes(x = `Sustainable Development Index`, 
            y = `Murder Rate per 100K`)
        ) +
-  geom_point(color = 'maroon') +
+  geom_point(color = '#00BF7D') +
   geom_smooth(method = "lm",
               color = 'black') + 
-  labs(title = 'Japan')
+  labs(title = 'Japan',
+       subtitle = "Murder Rate per 100K") + 
+  theme(axis.title.y = element_blank(),
+        plot.title.position = "plot") + 
+  stat_regline_equation(label.x = -Inf, label.y = Inf, vjust = 1.5, hjust = -0.1, size = 3) + 
+  stat_cor(label.x = -Inf, label.y = Inf, vjust = 3, hjust = -0.1, size = 3)
 
+# Total Country Plot ------------------------------ #
 totalcountry_plot_lm <- data_clean |>
   ggplot(aes(x = `Sustainable Development Index`, 
            y = `Murder Rate per 100K`)
@@ -219,10 +249,14 @@ totalcountry_plot_lm <- data_clean |>
   geom_point(aes(color = country)) +
   geom_smooth(method = "lm",
               color = 'black') + 
-  labs(title = 'All Countries')
+  labs(title = 'All Countries',
+       subtitle = "Murder Rate per 100K") + 
+  theme(axis.title.y = element_blank(),
+        plot.title.position = "plot") + 
+  stat_regline_equation(label.x = -Inf, label.y = Inf, vjust = 1.5, hjust = -0.1, size = 3) + 
+  stat_cor(label.x = -Inf, label.y = Inf, vjust = 3, hjust = -0.1, size = 3)
 
 
-library(patchwork)
 us_plot_lm / australia_plot_lm / germany_plot_lm / singapore_plot_lm / japan_plot_lm / totalcountry_plot_lm
 
 ```
