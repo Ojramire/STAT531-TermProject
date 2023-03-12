@@ -408,6 +408,11 @@ kable(x=Variability, col.names=Column_names) %>%
 
 The proportion of the variability in our response value (Murder Rate per 100K in these 5 countries) that is accounted for by our regression model (totalcountry_lm) is the resulting R-squared value of 0.0761. So, 7.61% of the variation in Murders per 100K people in these 5 countries can be explained by the Sustainable Development Index (SDI) for the countries, while the remaining 92.39% is due to other factors or random variation. This suggests that our model is low quality, and that the SDI does not explain the variability in Murders per 100K very well.
 
+However...
+Our residual variance for our totalcountry_lm is 7.62. This is the amount of unexplained variability in Murders that is not accounted for by SDI in the model. Since out Residual variance is 7.62, this indicates that the model is doing a better job of explaining the variability in the response variable.
+
+
+
 ## References:
 
 Sustainable Development Index. (2019). Gapminder. <https://www.gapminder.org/data/> 
