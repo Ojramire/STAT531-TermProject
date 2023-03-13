@@ -37,12 +37,14 @@ We would hypothesize that the sustainability development index is strongly negat
 ```{r setup}
 #| message: FALSE
 library(tidyverse)
+library(car)
 library(here)
 library(readr)
 library(DT)
 library(ggpubr)
 library(patchwork)
 library(broom)
+library(glue)
 
 #| message: FALSE
 murder_RAW <- read_csv(here::here("murder_per_100000_people.csv"))
@@ -424,54 +426,34 @@ anova_table_total_clean <- anova_table_total |>
          "Mean Squared Error" = "meansq",
          "P-Value" = "p.value") |>
   mutate(RMSE = sqrt(`Mean Squared Error`)) 
+```
 
-total_resid <- totalcountry_lm %>% 
-  augment() %>% 
+```{r}
+regfunction <- function(model, limit, country){
+plot1 <-   augment(model) %>% 
   ggplot(aes(x=.fitted, y=.resid))+
   geom_point()+
   geom_hline(yintercept=0, linetype=2)+
-  scale_y_continuous(limits=c(-8, 8))+
-  labs(x="Fitted Values", y="", subtitle="Residuals", title="All Countries")
+  scale_y_continuous(limits=c(-limit, limit))+
+  labs(x="Fitted Values", y="", subtitle="Residuals", title=glue(country, " Residual Plot"))
 
-us_resid <- us_lm %>% 
-  augment() %>% 
-  ggplot(aes(x=.fitted, y=.resid))+
-  geom_point()+
-  geom_hline(yintercept=0, linetype=2)+
-  scale_y_continuous(limits=c(-0.75, 0.75))+
-  labs(x="Fitted Values", y="", subtitle="Residuals", title="United States")
+return(plot1)
+}
 
-australia_resid <- australia_lm %>% 
-  augment() %>% 
-  ggplot(aes(x=.fitted, y=.resid))+
-  geom_point()+
-  geom_hline(yintercept=0, linetype=2)+
-  scale_y_continuous(limits=c(-0.5, 0.5))+
-  labs(x="Fitted Values", y="", subtitle="Residuals", title="Australia")
 
-germany_resid <- germany_lm %>% 
-  augment() %>% 
-  ggplot(aes(x=.fitted, y=.resid))+
-  geom_point()+
-  geom_hline(yintercept=0, linetype=2)+
-  scale_y_continuous(limits=c(-0.3, 0.3))+
-  labs(x="Fitted Values", y="", subtitle="Residuals", title="Germany")
 
-singapore_resid <- singapore_lm %>% 
-  augment() %>% 
-  ggplot(aes(x=.fitted, y=.resid))+
-  geom_point()+
-  geom_hline(yintercept=0, linetype=2)+
-  scale_y_continuous(limits=c(-0.5, 0.5))+
-  labs(x="Fitted Values", y="", subtitle="Residuals", title="Singapore")
 
-japan_resid <- japan_lm %>% 
-  augment() %>% 
-  ggplot(aes(x=.fitted, y=.resid))+
-  geom_point()+
-  geom_hline(yintercept=0, linetype=2)+
-  scale_y_continuous(limits=c(-0.2, 0.2))+
-  labs(x="Fitted Values", y="", subtitle="Residuals", title="Japan")
+
+```
+```{r}
+#| fig-height: 20
+total_resid <- regfunction(totalcountry_lm, 8, "Overall")
+us_resid <- regfunction(us_lm, 0.75, "United States")
+australia_resid <- regfunction(australia_lm, 0.5, "Australia")
+germany_resid <- regfunction(germany_lm, 0.3, "Germany")
+singapore_resid <- regfunction(singapore_lm, 0.5, "Singapore")
+japan_resid <- regfunction(japan_lm, 0.2, "Japan")
+
 
 us_resid / 
   australia_resid /
