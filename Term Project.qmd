@@ -359,73 +359,29 @@ Ending with the Japan data, every unit increase in Sustainable Development Index
 With the linear regression equations formed, the next task to perform was a review of the model fit. Plots of the residuals for each model were constructed as shown in Figure 5.
 
 ```{r}
-#| fig-height: 20
+ANOVA_formatter <- function(model){
+  
+  ANOVA_table <- tidy(anova(model))
+  ANOVA_table_clean <- ANOVA_table |> 
+    select(-statistic) |> 
+    rename("Response Variable US" = "term",
+           "Degrees of Freedom" = "df",
+           "Sum of Squares" = "sumsq",
+           "Sum of Squares" = "sumsq",
+           "Mean Squared Error" = "meansq",
+           "P-Value" = "p.value") |>
+    mutate(RMSE = sqrt(`Mean Squared Error`))
+  
+  return(ANOVA_table_clean)
+}
+```
 
-# United States Plot ------------------------------ #
-anova_table_us <- tidy(anova(us_lm))
-anova_table_us_clean <- anova_table_us |>
-  select(-statistic) |>
-  rename("Response Variable US" = "term",
-         "Degrees of Freedom" = "df",
-         "Sum of Squares" = "sumsq",
-         "Mean Squared Error" = "meansq",
-         "P-Value" = "p.value") |>
-  mutate(RMSE = sqrt(`Mean Squared Error`)) 
-
-# Australia Plot ------------------------------ #
-anova_table_australia <- tidy(anova(australia_lm))
-anova_table_australia_clean <- anova_table_australia |>
-  select(-statistic) |>
-  rename("Response Variable Australia" = "term",
-         "Degrees of Freedom" = "df",
-         "Sum of Squares" = "sumsq",
-         "Mean Squared Error" = "meansq",
-         "P-Value" = "p.value") |>
-  mutate(RMSE = sqrt(`Mean Squared Error`))
-
-# Germany Plot ------------------------------ #
-anova_table_germany <- tidy(anova(germany_lm))
-anova_table_germany_clean <- anova_table_germany |>
-  select(-statistic) |>
-  rename("Response Variable Germany" = "term",
-         "Degrees of Freedom" = "df",
-         "Sum of Squares" = "sumsq",
-         "Mean Squared Error" = "meansq",
-         "P-Value" = "p.value") |>
-  mutate(RMSE = sqrt(`Mean Squared Error`)) 
-
-# Singapore Plot ------------------------------ #
-anova_table_singapore <- tidy(anova(singapore_lm))
-anova_table_singapore_clean <- anova_table_singapore |>
-  select(-statistic) |>
-  rename("Response Variable Singapore" = "term",
-         "Degrees of Freedom" = "df",
-         "Sum of Squares" = "sumsq",
-         "Mean Squared Error" = "meansq",
-         "P-Value" = "p.value") |>
-  mutate(RMSE = sqrt(`Mean Squared Error`)) 
-
-# Japan Plot ------------------------------ #
-anova_table_japan <- tidy(anova(japan_lm))
-anova_table_japan_clean <- anova_table_japan |>
-  select(-statistic) |>
-  rename("Response Variable Japan" = "term",
-         "Degrees of Freedom" = "df",
-         "Sum of Squares" = "sumsq",
-         "Mean Squared Error" = "meansq",
-         "P-Value" = "p.value") |>
-  mutate(RMSE = sqrt(`Mean Squared Error`)) 
-
-# Total Plot ------------------------------ #
-anova_table_total <- tidy(anova(totalcountry_lm))
-anova_table_total_clean <- anova_table_total |>
-  select(-statistic) |>
-  rename("Response Variable Total" = "term",
-         "Degrees of Freedom" = "df",
-         "Sum of Squares" = "sumsq",
-         "Mean Squared Error" = "meansq",
-         "P-Value" = "p.value") |>
-  mutate(RMSE = sqrt(`Mean Squared Error`)) 
+```{r}
+anova_us <- ANOVA_formatter(us_lm)
+anova_australia <- ANOVA_formatter(australia_lm)
+anova_germany <- ANOVA_formatter(germany_lm)
+anova_singapore <- ANOVA_formatter(singapore_lm)
+anova_japan <- ANOVA_formatter(japan_lm)
 ```
 
 ```{r}
@@ -439,11 +395,6 @@ plot1 <-   augment(model) %>%
 
 return(plot1)
 }
-
-
-
-
-
 ```
 ```{r}
 #| fig-height: 20
