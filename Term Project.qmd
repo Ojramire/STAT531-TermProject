@@ -188,30 +188,12 @@ lm_japan <- lm_builder("Japan", data_clean)
 ```
 
 ```{r}
-plot_builder <- function(df, countryfilter, countrycolor){
-  country_plot <- df |> 
-    filter(country == countryfilter) |> 
-    ggplot(aes(x = `Sustainable Development Index`,
-               y = `Murder Rate per 100K`)
-    ) + 
-    geom_point(color = countrycolor) + 
-    geom_smooth(method = "lm",
-                color = "black",
-                size = 0.675) + 
-    labs(title = "United States",
-         subtitle = "Murder Rate per 100K") + 
-    theme(axis.title.y = element_blank(),
-          plot.title.position = "plot") + 
-    stat_regline_equation(label.x = -Inf, label.y = Inf, vjust = 1.5, hjust = -0.1, size = 3) + 
-    stat_cor(label.x = -Inf, label.y = Inf, vjust = 3, hjust = -0.1, size = 3)
-}
-```
-```{r}
 # United States plot ------------------------------ #
-us_plot_lm <- data_us |> 
-ggplot(aes(x = `Sustainable Development Index`, 
-           y = `Murder Rate per 100K`)
-       ) +
+plot_lm_us <- data_clean |> 
+  filter(country == "United States") |> 
+  ggplot(aes(x = `Sustainable Development Index`, 
+             y = `Murder Rate per 100K`)
+  ) +
   geom_point(color = "#E76BF3") +
   geom_smooth(method = "lm",
               color = "black",
@@ -225,10 +207,11 @@ ggplot(aes(x = `Sustainable Development Index`,
 
 
 # Australia Plot ------------------------------ #
-australia_plot_lm <- data_australia |> 
-ggplot(aes(x = `Sustainable Development Index`, 
-           y = `Murder Rate per 100K`)
-       ) +
+plot_lm_australia <- data_clean |> 
+  filter(country == "Australia") |> 
+  ggplot(aes(x = `Sustainable Development Index`, 
+             y = `Murder Rate per 100K`)
+  ) +
   geom_point(color = '#F8766D') +
   geom_smooth(method = "lm",
               color = 'black',
@@ -242,10 +225,11 @@ ggplot(aes(x = `Sustainable Development Index`,
 
 
 # Germany Plot ------------------------------ #
-germany_plot_lm <- data_germany |> 
-ggplot(aes(x = `Sustainable Development Index`, 
-           y = `Murder Rate per 100K`)
-       ) +
+plot_lm_germany <- data_clean |> 
+  filter(country == "Germany") |> 
+  ggplot(aes(x = `Sustainable Development Index`, 
+             y = `Murder Rate per 100K`)
+  ) +
   geom_point(color = '#A3A500') +
   geom_smooth(method = "lm",
               color = 'black',
@@ -259,10 +243,11 @@ ggplot(aes(x = `Sustainable Development Index`,
 
 
 # Singapore Plot ------------------------------ #
-singapore_plot_lm <- data_singapore |> 
-ggplot(aes(x = `Sustainable Development Index`, 
-           y = `Murder Rate per 100K`)
-       ) +
+plot_lm_singapore <- data_clean |> 
+  filter(country == "Singapore") |> 
+  ggplot(aes(x = `Sustainable Development Index`, 
+             y = `Murder Rate per 100K`)
+  ) +
   geom_point(color = "#00B0F6") +
   geom_smooth(method = "lm",
               color = 'black',
@@ -276,10 +261,11 @@ ggplot(aes(x = `Sustainable Development Index`,
 
 
 # Japan Plot ------------------------------ #
-japan_plot_lm <- data_japan |> 
-ggplot(aes(x = `Sustainable Development Index`, 
-           y = `Murder Rate per 100K`)
-       ) +
+plot_lm_japan <- data_clean |> 
+  filter(country == "Japan") |> 
+  ggplot(aes(x = `Sustainable Development Index`, 
+             y = `Murder Rate per 100K`)
+  ) +
   geom_point(color = '#00BF7D') +
   geom_smooth(method = "lm",
               color = 'black',
@@ -291,11 +277,11 @@ ggplot(aes(x = `Sustainable Development Index`,
   stat_regline_equation(label.x = -Inf, label.y = Inf, vjust = 1.5, hjust = -0.1, size = 3) + 
   stat_cor(label.x = -Inf, label.y = Inf, vjust = 3, hjust = -0.1, size = 3)
 
-us_plot_lm / 
-  australia_plot_lm / 
-  germany_plot_lm / 
-  singapore_plot_lm / 
-  japan_plot_lm + 
+plot_lm_us / 
+  plot_lm_australia / 
+  plot_lm_germany / 
+  plot_lm_singapore / 
+  plot_lm_japan + 
   plot_annotation(caption = "Figure 3. Individual linear regression models applied to country data.",
                   theme = theme(plot.caption = element_text(hjust = 0.5,
                                                             size = 11)
@@ -307,7 +293,7 @@ For all countries combined, all SDI values were fed into the model. Figure 4 bel
 
 ```{r}
 # Total Country Plot ------------------------------ #
-totalcountry_plot_lm <- data_clean |>
+plot_lm_total <- data_clean |>
   ggplot(aes(x = `Sustainable Development Index`, 
            y = `Murder Rate per 100K`)
        ) +
@@ -323,7 +309,7 @@ totalcountry_plot_lm <- data_clean |>
   stat_cor(label.x = -Inf, label.y = Inf, vjust = 3, hjust = -0.1, size = 3)
 
 
-totalcountry_plot_lm + 
+plot_lm_total + 
   plot_annotation(caption = "Figure 4. Overall model with countries combined.",
                   theme = theme(plot.caption = element_text(hjust = 0.5,
                                                             size = 11)
