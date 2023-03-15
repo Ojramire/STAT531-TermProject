@@ -79,7 +79,7 @@ data_opt <- data_RAW |>
   mutate(NA_percent = sum(is.na(across("Murder Rate per 100K":"Sustainable Development Index")))/36) |>
 
 # Remove all countries with more than 10% NAs
-  filter(NA_percent < 0.1)
+  filter(NA_percent < 0.4)
 ```
 
 ::: callout-warning
@@ -94,28 +94,31 @@ data_opt |>
 ```
 :::
 
-Ultimately, five countries were selected - the United States, Australia, Germany, Singapore, and Japan due to their diverse geographical locations.
+something about the countries selected
 
 ```{r}
-select_countries <- c("United States", "Australia", "Germany", "Singapore", "Japan")  # Final list of countries chosen for analysis
-
 data_clean <- data_opt |>
-  filter(country %in% select_countries) |>
-  select(country:"Sustainable Development Index")
+  ungroup() |>
+  select(year:"Sustainable Development Index") |>
+  remove_missing() |>
+  group_by(year) |>
+  summarise("Average Murder Rate" = mean(`Murder Rate per 100K`),
+            "Average SDI"         = mean(`Sustainable Development Index`))
+
 datatable(data_clean, class = 'cell-border stripe', rownames = FALSE)
 ```
 
 ## Regression Analysis
 
-The analysis for this data set will be performed at two different levels. The first is five separate linear regression analyses for each of the countries selected. The second is a single regression analysis for all five countries combined. In the following graphs, Figure 1 captures the overall SDI versus murder rate for all countries, while Figure 2 plots both variables separately over time for the countries.
+The analysis for this data set will be performed with a single regression analysis for all 61 countries combined. In the following graphs, Figure 1 captures the overall average SDI versus average murder rate for all countries, while Figure 2 plots both variables separately over time for the countries.
 
 ```{r}
 data_clean |>
-  ggplot(aes(x = `Sustainable Development Index`, y = `Murder Rate per 100K`)) +
-  geom_point(aes(color = fct_reorder(country, `Murder Rate per 100K`, .desc = TRUE))) +
-  labs(x = "Sustainable Development Index (SDI)", 
-       y = "", subtitle = "Murder Rate per 100K", 
-       caption = "Figure 1. Relationship between SDI and Murder Rate per 100k for all 5 selected countries.") +
+  ggplot(aes(x = `Average SDI`, y = `Average Murder Rate`)) +
+  geom_point(aes(color = year)) +
+  labs(x = "Average Sustainable Development Index (SDI)/Year", 
+       y = "", subtitle = "Average Murder Rate per 100K/Year", 
+       caption = "Figure 1. Relationship between he average yearly SDI and Murder Rate per 100k for all 61 selected countries.") +
   theme(plot.title.position = "plot",
         plot.caption = element_text(hjust = 0.5,
                                     size = 11)) +
@@ -127,8 +130,9 @@ fig.align = 'center'
 
 SDI_plot <- data_clean |>
   ggplot(aes(x = year, 
-             y = `Sustainable Development Index`)) +
-  geom_line(aes(color = fct_reorder(country, `Murder Rate per 100K`, .desc = TRUE))) +
+             y = `Average SDI`)) +
+  geom_line() +
+  geom_jitter() +
   labs(x = "Year", 
        y = "", 
        subtitle = "Sustainable Development Index \n(SDI)") +
@@ -138,8 +142,9 @@ SDI_plot <- data_clean |>
 
 murder_plot <- data_clean |>
   ggplot(aes(x = year, 
-             y = `Murder Rate per 100K`)) +
-  geom_line(aes(color = fct_reorder(country, `Murder Rate per 100K`, .desc = TRUE))) +
+             y = `Average Murder Rate`)) +
+  geom_line() +
+  geom_jitter() +
   labs(x = "Year", 
        y = "", 
        subtitle = "Murder Rate per 100K") +
@@ -148,11 +153,9 @@ murder_plot <- data_clean |>
 
 SDI_plot + 
   murder_plot + 
-  plot_annotation(caption = "Figure 2. Sustainable Development Index and Murder Rate per 100K from 1989 to 2006.",
+  plot_annotation(caption = "Figure 2. Average SDI and Average Murder Rate per 100K from 1989 to 2006.",
                   theme = theme(plot.caption = element_text(hjust = 0.5,
-                                                            size = 11)
-                                )
-                  )
+                                                            size = 11)))
 ```
 
 From Figure 1, we can see that there is a moderate-strong positive relationship between our variables, meaning that for the US, as the sustainable development index (SDI) increases, so do murder rates. For the other four countries, there is also a positive relationship between our response and explanatory variables, however it is a much weaker relationship for these countries. This positive relationship is interesting, because initially we predicted a negative relationship, as SDI increases, murder rates should be going down.
