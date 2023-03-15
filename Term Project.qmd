@@ -188,94 +188,30 @@ lm_japan <- lm_builder("Japan", data_clean)
 ```
 
 ```{r}
-# United States plot ------------------------------ #
-plot_lm_us <- data_clean |> 
-  filter(country == "United States") |> 
-  ggplot(aes(x = `Sustainable Development Index`, 
-             y = `Murder Rate per 100K`)
-  ) +
-  geom_point(color = "#E76BF3") +
-  geom_smooth(method = "lm",
+plot_builder <- function(df, countryfilter, colorfilter){
+  df_clean <- df |> 
+    filter(country == countryfilter) |> 
+    ggplot(aes(x = `Sustainable Development Index`,
+               y = `Murder Rate per 100K`)
+           ) + 
+    geom_point(color = colorfilter) + 
+    geom_smooth(method = "lm",
               color = "black",
               size = 0.675) + 
-  labs(title = "United States",
-       subtitle = "Murder Rate per 100K") + 
-  theme(axis.title.y = element_blank(),
-        plot.title.position = "plot") + 
-  stat_regline_equation(label.x = -Inf, label.y = Inf, vjust = 1.5, hjust = -0.1, size = 3) + 
-  stat_cor(label.x = -Inf, label.y = Inf, vjust = 3, hjust = -0.1, size = 3)
-
-
-# Australia Plot ------------------------------ #
-plot_lm_australia <- data_clean |> 
-  filter(country == "Australia") |> 
-  ggplot(aes(x = `Sustainable Development Index`, 
-             y = `Murder Rate per 100K`)
-  ) +
-  geom_point(color = '#F8766D') +
-  geom_smooth(method = "lm",
-              color = 'black',
-              size = 0.675) + 
-  labs(title = "Australia",
-       subtitle = "Murder Rate per 100K") + 
-  theme(axis.title.y = element_blank(),
-        plot.title.position = "plot") + 
-  stat_regline_equation(label.x = -Inf, label.y = Inf, vjust = 1.5, hjust = -0.1, size = 3) + 
-  stat_cor(label.x = -Inf, label.y = Inf, vjust = 3, hjust = -0.1, size = 3)
-
-
-# Germany Plot ------------------------------ #
-plot_lm_germany <- data_clean |> 
-  filter(country == "Germany") |> 
-  ggplot(aes(x = `Sustainable Development Index`, 
-             y = `Murder Rate per 100K`)
-  ) +
-  geom_point(color = '#A3A500') +
-  geom_smooth(method = "lm",
-              color = 'black',
-              size = 0.675) + 
-  labs(title = 'Germany',
-       subtitle = "Murder Rate per 100K") + 
-  theme(axis.title.y = element_blank(),
-        plot.title.position = "plot") + 
-  stat_regline_equation(label.x = -Inf, label.y = Inf, vjust = 1.5, hjust = -0.1, size = 3) + 
-  stat_cor(label.x = -Inf, label.y = Inf, vjust = 3, hjust = -0.1, size = 3)
-
-
-# Singapore Plot ------------------------------ #
-plot_lm_singapore <- data_clean |> 
-  filter(country == "Singapore") |> 
-  ggplot(aes(x = `Sustainable Development Index`, 
-             y = `Murder Rate per 100K`)
-  ) +
-  geom_point(color = "#00B0F6") +
-  geom_smooth(method = "lm",
-              color = 'black',
-              size = 0.675) + 
-  labs(title = 'Singapore',
-       subtitle = "Murder Rate per 100K") + 
-  theme(axis.title.y = element_blank(),
-        plot.title.position = "plot") + 
-  stat_regline_equation(label.x = -Inf, label.y = Inf, vjust = 1.5, hjust = -0.1, size = 3) + 
-  stat_cor(label.x = -Inf, label.y = Inf, vjust = 3, hjust = -0.1, size = 3)
-
-
-# Japan Plot ------------------------------ #
-plot_lm_japan <- data_clean |> 
-  filter(country == "Japan") |> 
-  ggplot(aes(x = `Sustainable Development Index`, 
-             y = `Murder Rate per 100K`)
-  ) +
-  geom_point(color = '#00BF7D') +
-  geom_smooth(method = "lm",
-              color = 'black',
-              size = 0.675) + 
-  labs(title = 'Japan',
-       subtitle = "Murder Rate per 100K") + 
-  theme(axis.title.y = element_blank(),
-        plot.title.position = "plot") + 
-  stat_regline_equation(label.x = -Inf, label.y = Inf, vjust = 1.5, hjust = -0.1, size = 3) + 
-  stat_cor(label.x = -Inf, label.y = Inf, vjust = 3, hjust = -0.1, size = 3)
+    labs(title = "United States",
+         subtitle = "Murder Rate per 100K") + 
+    theme(axis.title.y = element_blank(),
+          plot.title.position = "plot") + 
+    stat_regline_equation(label.x = -Inf, label.y = Inf, vjust = 1.5, hjust = -0.1, size = 3) + 
+    stat_cor(label.x = -Inf, label.y = Inf, vjust = 3, hjust = -0.1, size = 3)
+}
+```
+```{r}
+plot_lm_us <- plot_builder(data_clean, "United States", "#E76BF3")
+plot_lm_australia <- plot_builder(data_clean, "United States", "#F8766D")
+plot_lm_germany <- plot_builder(data_clean, "Germany", "#A3A500")
+plot_lm_singapore <- plot_builder(data_clean, "Singapore", "#00B0F6")
+plot_lm_japan <- plot_builder(data_clean, "Japan", "#00BF7D")
 
 plot_lm_us / 
   plot_lm_australia / 
