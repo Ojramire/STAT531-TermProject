@@ -162,38 +162,51 @@ Regarding Figure 2, we can observe that both SDI and murder rates have been goin
 ### Linear Regression
 
 A linear regression model was first constructed within each country. The predictor variable for each model is the SDI, while the response is the Murder Rate per 100K. Figure 3 displays all of the countries, though take note of the different axis scales used for each one.
+```{r}
+lm_builder <- function(country_filter, df){
+  df_clean <- df |> 
+    filter(country == country_filter)
+  
+  country_lm <- lm(`Murder Rate per 100K` ~ `Sustainable Development Index`,
+                   data = df_clean)
+  
+  return(country_lm)
+}
+```
 
 ```{r}
 #| fig-height: 16
-totalcountry_lm <- lm(`Murder Rate per 100K` ~ `Sustainable Development Index`,
+lm_totalcountry <- lm(`Murder Rate per 100K` ~ `Sustainable Development Index`,
                     data = data_clean
                     )
 
-data_us <- data_clean |>
-  filter(country == "United States")
-us_lm <- lm(`Murder Rate per 100K` ~ `Sustainable Development Index`,
-                    data = data_us)
+lm_us <- lm_builder("United States", data_clean)
+lm_australia <- lm_builder("Australia", data_clean)
+lm_germany <- lm_builder("Germany", data_clean)
+lm_singapore <- lm_builder("Singapore", data_clean)
+lm_japan <- lm_builder("Japan", data_clean)
+```
 
-data_australia <- data_clean |>
-  filter(country == "Australia")
-australia_lm <- lm(`Murder Rate per 100K` ~ `Sustainable Development Index`,
-                    data = data_australia)
-
-data_germany <- data_clean |>
-  filter(country == "Germany")
-germany_lm <- lm(`Murder Rate per 100K` ~ `Sustainable Development Index`,
-                    data = data_germany)
-
-data_singapore <- data_clean |>
-  filter(country == "Singapore")
-singapore_lm <- lm(`Murder Rate per 100K` ~ `Sustainable Development Index`,
-                    data = data_singapore)
-
-data_japan <- data_clean |>
-  filter(country == "Japan")
-japan_lm <- lm(`Murder Rate per 100K` ~ `Sustainable Development Index`,
-                    data = data_japan)
-
+```{r}
+plot_builder <- function(df, countryfilter, countrycolor){
+  country_plot <- df |> 
+    filter(country == countryfilter) |> 
+    ggplot(aes(x = `Sustainable Development Index`,
+               y = `Murder Rate per 100K`)
+    ) + 
+    geom_point(color = countrycolor) + 
+    geom_smooth(method = "lm",
+                color = "black",
+                size = 0.675) + 
+    labs(title = "United States",
+         subtitle = "Murder Rate per 100K") + 
+    theme(axis.title.y = element_blank(),
+          plot.title.position = "plot") + 
+    stat_regline_equation(label.x = -Inf, label.y = Inf, vjust = 1.5, hjust = -0.1, size = 3) + 
+    stat_cor(label.x = -Inf, label.y = Inf, vjust = 3, hjust = -0.1, size = 3)
+}
+```
+```{r}
 # United States plot ------------------------------ #
 us_plot_lm <- data_us |> 
 ggplot(aes(x = `Sustainable Development Index`, 
@@ -377,11 +390,11 @@ ANOVA_formatter <- function(model){
 ```
 
 ```{r}
-anova_us <- ANOVA_formatter(us_lm)
-anova_australia <- ANOVA_formatter(australia_lm)
-anova_germany <- ANOVA_formatter(germany_lm)
-anova_singapore <- ANOVA_formatter(singapore_lm)
-anova_japan <- ANOVA_formatter(japan_lm)
+anova_us <- ANOVA_formatter(lm_us)
+anova_australia <- ANOVA_formatter(lm_australia)
+anova_germany <- ANOVA_formatter(lm_germany)
+anova_singapore <- ANOVA_formatter(lm_singapore)
+anova_japan <- ANOVA_formatter(lm_japan)
 ```
 
 ```{r}
@@ -398,20 +411,20 @@ return(plot1)
 ```
 ```{r}
 #| fig-height: 20
-total_resid <- regfunction(totalcountry_lm, 8, "Overall")
-us_resid <- regfunction(us_lm, 0.75, "United States")
-australia_resid <- regfunction(australia_lm, 0.5, "Australia")
-germany_resid <- regfunction(germany_lm, 0.3, "Germany")
-singapore_resid <- regfunction(singapore_lm, 0.5, "Singapore")
-japan_resid <- regfunction(japan_lm, 0.2, "Japan")
+resid_total <- regfunction(lm_totalcountry, 8, "Overall")
+resid_us <- regfunction(lm_us, 0.75, "United States")
+resid_australia <- regfunction(lm_australia, 0.5, "Australia")
+resid_germany <- regfunction(lm_germany, 0.3, "Germany")
+resid_singapore <- regfunction(lm_singapore, 0.5, "Singapore")
+resid_japan <- regfunction(lm_japan, 0.2, "Japan")
 
 
-us_resid / 
-  australia_resid /
-  germany_resid /
-  singapore_resid /
-  japan_resid / 
-  total_resid + 
+resid_us / 
+  resid_australia /
+  resid_germany /
+  resid_singapore /
+  resid_japan / 
+  resid_total + 
   plot_annotation(caption = "Figure 5. Residual plots of all individual countries and of combined countries.",
                   theme = theme(plot.caption = element_text(hjust = 0.5,
                                                             size = 11)
@@ -421,12 +434,12 @@ us_resid /
 The variance of the models were also examined to determine their robustness. Table 2 contains the summarized variances for the responses, fitted values, and residuals.
 
 ```{r}
-augment_total <- augment(totalcountry_lm)
-augment_us <- augment(us_lm)
-augment_aus <- augment(australia_lm)
-augment_ger <- augment(germany_lm)
-augment_sing <- augment(singapore_lm)
-augment_jp <- augment(japan_lm)
+augment_total <- augment(lm_totalcountry)
+augment_us <- augment(lm_us)
+augment_aus <- augment(lm_australia)
+augment_ger <- augment(lm_germany)
+augment_sing <- augment(lm_singapore)
+augment_jp <- augment(lm_japan)
 
 Regression <- c("Total", "United States", "Australia", "Germany", "Singapore", "Japan")
 Response_variability <- c(var(augment_total$`Murder Rate per 100K`),
@@ -452,9 +465,9 @@ kable(x = Variability,
 
 ```
 
-Our residual variance for our model (totalcountry_lm) is 7.62. When you then divide the residual variance (7.62) over the response variance (8.25), you get 92.36%. This is the amount of unexplained variability in Murders that is not accounted for by SDI in the model. This indicates that the model is doing a poor job of explaining the variability in the response variable.
+Our residual variance for our model (lm_totalcountry) is 7.62. When you then divide the residual variance (7.62) over the response variance (8.25), you get 92.36%. This is the amount of unexplained variability in Murders that is not accounted for by SDI in the model. This indicates that the model is doing a poor job of explaining the variability in the response variable.
 
-To check this, we also observed the R-squared value, which is proportion of the variability in our response variable (Murder Rate per 100K in these 5 countries) that is accounted for by our regression model (totalcountry_lm), which came out to be 0.0761. So, 7.61% of the variation in Murders per 100K people in these 5 countries can be explained by the Sustainable Development Index (SDI) for the countries, while the remaining 92.39% is due to other factors or random variation. This further suggests that our model is low quality, and that the SDI does not explain the variability in Murders per 100K very well.
+To check this, we also observed the R-squared value, which is proportion of the variability in our response variable (Murder Rate per 100K in these 5 countries) that is accounted for by our regression model (lm_totalcountry), which came out to be 0.0761. So, 7.61% of the variation in Murders per 100K people in these 5 countries can be explained by the Sustainable Development Index (SDI) for the countries, while the remaining 92.39% is due to other factors or random variation. This further suggests that our model is low quality, and that the SDI does not explain the variability in Murders per 100K very well.
 
 ## References:
 
