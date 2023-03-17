@@ -429,9 +429,9 @@ new_p <- sim_response %>%
 return(new_p+obs_p)
 
 }
-SimDistribution(totalcountry_lm, 1, "Overall")
-SimDistribution(us_lm, 0.2, "US")
-SimDistribution(australia_lm, 0.2, "Australia")
+SimDistribution(lm_totalcountry, 1, "Overall")
+SimDistribution(lm_us, 0.2, "US")
+SimDistribution(lm_australia, 0.2, "Australia")
 ```
 
 ```{r}
@@ -451,7 +451,7 @@ colnames(simdata) <- colnames(simdata) |>
                   replace = "_")
 return(simdata)
 }
-us_sim <- sims(us_lm, 1000)
+us_sim <- sims(lm_us, 1000)
 us_sims <- data_clean %>%  
   filter(country=="United States") %>%  
   select(`Murder Rate per 100K`) %>%  
