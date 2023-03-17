@@ -399,7 +399,7 @@ noise <- function(x, mean = 0, sd){
             mean, 
             sd)
 }
-SimDistribution <- function(lm, bin, country){
+SimDistribution <- function(lm, bin, poslim, neglim, country){
 countryerror <- sigma(lm)
 countrypredict <- predict(lm)
 sim_response <- tibble(sim_MR = noise(countrypredict, 
@@ -422,7 +422,7 @@ new_p <- sim_response %>%
        y = "",
        subtitle = "Count") +
   theme_bw()+
-  scale_x_continuous(limits=c(-10,15))
+  scale_x_continuous(limits=c(neglim,poslim))
   
 return(new_p+obs_p)
 
@@ -433,8 +433,29 @@ SimDistribution(australia_lm, 0.2, "Australia")
 ```
 
 ```{r}
+#3.2 NOT FINISHED
+#Feel free to refine/fix
 
-
+sims <- function(lm, nsims){
+countryerror <- sigma(lm)
+countrypredict <- predict(lm)
+simdata <- map_dfc(.x = 1:nsims,
+                .f = ~ tibble(sim = noise(countrypredict, 
+                                          sd = countryerror)
+                              )
+                )
+colnames(simdata) <- colnames(simdata) |> 
+  str_replace(pattern = "\\.\\.\\.",
+                  replace = "_")
+return(simdata)
+}
+us_sim <- sims(us_lm, 1000)
+us_sims <- data_clean %>%  
+  filter(country=="United States") %>%  
+  select(`Murder Rate per 100K`) %>%  
+  ungroup() %>% 
+  bind_cols(us_sim)
+us_sim
 ```
 
 ## References:
