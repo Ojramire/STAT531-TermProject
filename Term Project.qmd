@@ -399,28 +399,40 @@ noise <- function(x, mean = 0, sd){
             mean, 
             sd)
 }
-totalcountryerror <- sigma(totalcountry_lm)
-totalpredict <- predict(totalcountry_lm)
-sim_response <- tibble(sim_MR = noise(totalpredict, 
-                                           sd = totalcountryerror)
+SimDistribution <- function(lm, bin, country){
+countryerror <- sigma(lm)
+countrypredict <- predict(lm)
+sim_response <- tibble(sim_MR = noise(countrypredict, 
+                                           sd = countryerror)
                    )
 
 
 obs_p <- data_clean %>% 
   ggplot(aes(x=`Murder Rate per 100K`)) +
-  geom_histogram(binwidth = 1) +
-  labs(x = "Observed Body Mass (g)",
+  geom_histogram(binwidth = bin) +
+  labs(title=glue(country, " Simulated Distribution"), x = "Observed Murder Rate per 100K",
        y = "",
        subtitle = "Count") +
-  theme_bw()
+  theme_bw()+
+  scale_x_continuous(limits=c(-10,15))
 new_p <- sim_response %>% 
   ggplot(aes(x = sim_MR)) +
-  geom_histogram(binwidth = 2) +
-  labs(x = "Simulated Body Mass (g)",
+  geom_histogram(binwidth = bin) +
+  labs(title=glue(country, " Observed Distribution"), x = "Simulated Murder Rate per 100K",
        y = "",
        subtitle = "Count") +
-  theme_bw()
-new_p+obs_p
+  theme_bw()+
+  scale_x_continuous(limits=c(-10,15))
+  
+return(new_p+obs_p)
+
+}
+SimDistribution(totalcountry_lm, 1, "Overall")
+SimDistribution(us_lm, 0.2, "US")
+SimDistribution(australia_lm, 0.2, "Australia")
+```
+
+```{r}
 
 
 ```
