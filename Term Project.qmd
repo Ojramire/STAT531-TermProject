@@ -208,6 +208,7 @@ plot_builder <- function(df, countryfilter, colorfilter){
 }
 ```
 ```{r}
+#| fig-height: 16
 plot_lm_us <- plot_builder(data_clean, "United States", "#F8766D")
 plot_lm_australia <- plot_builder(data_clean, "Australia", "#A3A500")
 plot_lm_germany <- plot_builder(data_clean, "Germany", "#00BF7D")
