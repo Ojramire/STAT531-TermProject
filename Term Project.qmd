@@ -426,7 +426,7 @@ sim_response <- tibble(sim_MR = noise(countrypredict,
 obs_p <- data %>% 
   ggplot(aes(x=`Murder Rate per 100K`)) +
   geom_histogram(binwidth = bin) +
-  labs(title=glue(countryname, " Simulated Distribution"), x = "Observed Murder Rate per 100K",
+  labs(title=glue(countryname, " Observed Distribution"), x = "Observed Murder Rate per 100K",
        y = "",
        subtitle = "Count") +
   theme_bw()+
@@ -434,7 +434,7 @@ obs_p <- data %>%
 new_p <- sim_response %>% 
   ggplot(aes(x = sim_MR)) +
   geom_histogram(binwidth = bin) +
-  labs(title=glue(countryname, " Observed Distribution"), x = "Simulated Murder Rate per 100K",
+  labs(title=glue(countryname, " Simulated Distribution"), x = "Simulated Murder Rate per 100K",
        y = "",
        subtitle = "Count") +
   theme_bw()+
