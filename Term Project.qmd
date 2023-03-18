@@ -112,7 +112,7 @@ The analysis for this data set will be performed at two different levels. The fi
 ```{r}
 data_clean |>
   ggplot(aes(x = `Sustainable Development Index`, y = `Murder Rate per 100K`)) +
-  geom_point(aes(color = fct_reorder(country, `Murder Rate per 100K`, .desc = TRUE, .na_rm = TRUE))) +
+  geom_point(aes(color = fct_reorder(country, `Murder Rate per 100K`, .desc = TRUE, na.rm = TRUE))) +
   labs(x = "Sustainable Development Index (SDI)", 
        y = "", subtitle = "Murder Rate per 100K", 
        caption = "Figure 1. Relationship between SDI and Murder Rate per 100k for all 5 selected countries.") +
@@ -128,7 +128,7 @@ fig.align = 'center'
 SDI_plot <- data_clean |>
   ggplot(aes(x = year, 
              y = `Sustainable Development Index`)) +
-  geom_line(aes(color = fct_reorder(country, `Murder Rate per 100K`, .desc = TRUE, .na_rm = TRUE))) +
+  geom_line(aes(color = fct_reorder(country, `Murder Rate per 100K`, .desc = TRUE, na.rm = TRUE))) +
   labs(x = "Year", 
        y = "", 
        subtitle = "Sustainable Development Index \n(SDI)") +
@@ -139,7 +139,7 @@ SDI_plot <- data_clean |>
 murder_plot <- data_clean |>
   ggplot(aes(x = year, 
              y = `Murder Rate per 100K`)) +
-  geom_line(aes(color = fct_reorder(country, `Murder Rate per 100K`, .desc = TRUE, .na_rm = TRUE))) +
+  geom_line(aes(color = fct_reorder(country, `Murder Rate per 100K`, .desc = TRUE, na.rm = TRUE))) +
   labs(x = "Year", 
        y = "", 
        subtitle = "Murder Rate per 100K") +
@@ -235,7 +235,7 @@ plot_lm_total <- data_clean |>
   ggplot(aes(x = `Sustainable Development Index`, 
            y = `Murder Rate per 100K`)
        ) +
-  geom_point(aes(color = fct_reorder(country, `Murder Rate per 100K`, .desc = TRUE, .na_rm = TRUE))) +
+  geom_point(aes(color = fct_reorder(country, `Murder Rate per 100K`, .desc = TRUE, na.rm = TRUE))) +
   geom_smooth(method = "lm",
               color = 'black',
               size = 1) + 
@@ -388,7 +388,6 @@ kable(x = Variability,
       caption = "<center>Table 2. Variances of the linear regression models.</center>") %>% 
   kable_classic_2()
 
-
 ```
 
 Our residual variance for our model (lm_totalcountry) is 7.62. When you then divide the residual variance (7.62) over the response variance (8.25), you get 92.36%. This is the amount of unexplained variability in Murders that is not accounted for by SDI in the model. This indicates that the model is doing a poor job of explaining the variability in the response variable.
@@ -405,7 +404,7 @@ SimDistribution <- function(lm, bin, country){
 countryerror <- sigma(lm)
 countrypredict <- predict(lm)
 sim_response <- tibble(sim_MR = noise(countrypredict, 
-                                           sd = countryerror)
+                                      sd = countryerror)
                    )
 
 
