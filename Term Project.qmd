@@ -99,10 +99,24 @@ Ultimately, five countries were selected for analysis - the United States, Austr
 ```{r}
 select_countries <- c("United States", "Australia", "Germany", "Singapore", "Japan")  # Final list of countries chosen for analysis
 
+
+data_us <- data_clean %>% 
+  filter(country=="United States")
+data_australia <- data_clean %>% 
+  filter(country=="Australia")
+data_germany <- data_clean %>% 
+  filter(country=="Germany")
+data_singapore <- data_clean %>% 
+  filter(country=="Singapore")
+data_japan <- data_clean %>% 
+  filter(country=="Japan")
+
+
 data_clean <- data_opt |>
   filter(country %in% select_countries) |>
   select(country:"Sustainable Development Index")
 datatable(data_clean, class = 'cell-border stripe', rownames = FALSE)
+
 ```
 
 ## Regression Analysis
@@ -428,7 +442,7 @@ new_p <- sim_response %>%
 return(new_p+obs_p)
 
 }
-data_clean
+
 SimDistribution(lm_totalcountry, data_clean, 1, "Overall")
 SimDistribution(lm_us, data_us, 1, "United States")
 SimDistribution(lm_australia, data_australia, 1, "Australia")
