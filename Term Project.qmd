@@ -446,7 +446,7 @@ simdata <- map_dfc(.x = 1:nsims,
                                           sd = countryerror)
                               )
                 )
-colnames(simdata) <- colnames(simdata) |> 
+colnames(simdata) <- colnames(simdata) %>% 
   str_replace(pattern = "\\.\\.\\.",
                   replace = "_")
 return(simdata)
@@ -459,15 +459,15 @@ us_sims <- data_clean %>%
   bind_cols(us_sim) %>% 
   select(!country)
 us_sims
-sim_r_sq <- us_sims |> 
-  map(~ lm(`Murder Rate per 100K` ~ .x, data = us_sims)) |> 
-  map(glance) |> 
+sim_r_sq <- us_sims %>%  
+  map(~ lm(`Murder Rate per 100K` ~ .x, data = us_sims)) %>%  
+  map(glance) %>%  
   map_dbl(~ .x$r.squared)
 
 sim_r_sq <- sim_r_sq[names(sim_r_sq) != "Murder Rate per 100K"]
 
 
-tibble(sims = sim_r_sq) |> 
+tibble(sims = sim_r_sq) %>%  
   ggplot(aes(x = sims)) + 
   geom_histogram(binwidth = 0.025) +
   labs(x = expression("Simulated"~ R^2),
