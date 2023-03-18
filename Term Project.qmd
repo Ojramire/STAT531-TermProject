@@ -467,8 +467,8 @@ sim_r_sq <- us_sims %>%
 sim_r_sq <- sim_r_sq[names(sim_r_sq) != "Murder Rate per 100K"]
 
 
-tibble(sims = sim_r_sq) %>%  
-  ggplot(aes(x = sims)) + 
+tibble(us_sims = sim_r_sq) %>%  
+  ggplot(aes(x = us_sims)) + 
   geom_histogram(binwidth = 0.025) +
   labs(x = expression("Simulated"~ R^2),
        y = "",
