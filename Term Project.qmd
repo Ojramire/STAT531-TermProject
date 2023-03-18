@@ -401,7 +401,7 @@ noise <- function(x, mean = 0, sd){
             mean, 
             sd)
 }
-SimDistribution <- function(lm, bin, poslim, neglim, country){
+SimDistribution <- function(lm, bin, country){
 countryerror <- sigma(lm)
 countrypredict <- predict(lm)
 sim_response <- tibble(sim_MR = noise(countrypredict, 
@@ -424,7 +424,7 @@ new_p <- sim_response %>%
        y = "",
        subtitle = "Count") +
   theme_bw()+
-  scale_x_continuous(limits=c(neglim,poslim))
+  scale_x_continuous(limits=c(-10, 15))
   
 return(new_p+obs_p)
 
@@ -435,8 +435,8 @@ SimDistribution(lm_australia, 0.2, "Australia")
 ```
 
 ```{r}
-#3.2 NOT FINISHED
-#Feel free to refine/fix
+#3.2 Done in Basic way according to textbook
+#Feel free to refine/fix/functionize
 
 sims <- function(lm, nsims){
 countryerror <- sigma(lm)
@@ -453,11 +453,28 @@ return(simdata)
 }
 us_sim <- sims(lm_us, 1000)
 us_sims <- data_clean %>%  
-  filter(country=="United States") %>%  
+  filter(country=="United States") %>% 
   select(`Murder Rate per 100K`) %>%  
   ungroup() %>% 
-  bind_cols(us_sim)
-us_sim
+  bind_cols(us_sim) %>% 
+  select(!country)
+us_sims
+sim_r_sq <- us_sims |> 
+  map(~ lm(`Murder Rate per 100K` ~ .x, data = us_sims)) |> 
+  map(glance) |> 
+  map_dbl(~ .x$r.squared)
+
+sim_r_sq <- sim_r_sq[names(sim_r_sq) != "Murder Rate per 100K"]
+
+
+tibble(sims = sim_r_sq) |> 
+  ggplot(aes(x = sims)) + 
+  geom_histogram(binwidth = 0.025) +
+  labs(x = expression("Simulated"~ R^2),
+       y = "",
+       subtitle = "Number of Simulated Models") +
+  theme_bw()
+
 ```
 
 ## References:
