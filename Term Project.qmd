@@ -207,6 +207,7 @@ plot_builder <- function(df, countryfilter, colorfilter){
     stat_cor(label.x = -Inf, label.y = Inf, vjust = 3, hjust = -0.1, size = 3)
 }
 ```
+
 ```{r}
 #| fig-height: 16
 plot_lm_us <- plot_builder(data_clean, "United States", "#F8766D")
@@ -284,7 +285,7 @@ Next up with the Germany data, every unit increase in Sustainable Development In
 $$
 \hat{y}_{Murder Rate}=0.02891 x_{SDI}-0.28529
 $$ 
-Moving on to the Singapore data, every unit increase in Sustainable Development Index results in a 0.02891 increase in murder rate. Based on the intercept, with a SDI of 0, the murder rate would be around -0.28529 per 100k people, which is of course. 
+Moving on to the Singapore data, every unit increase in Sustainable Development Index results in a 0.02891 increase in murder rate. Based on the intercept, with a SDI of 0, the murder rate would be around -0.28529 per 100k people, which is of course impossible. 
 
 <center> **Japan Regression Equation:** </center>
 $$
@@ -392,7 +393,7 @@ kable(x = Variability,
 
 Our residual variance for our model (lm_totalcountry) is 7.62. When you then divide the residual variance (7.62) over the response variance (8.25), you get 92.36%. This is the amount of unexplained variability in Murders that is not accounted for by SDI in the model. This indicates that the model is doing a poor job of explaining the variability in the response variable.
 
-To check this, we also observed the R-squared value, which is proportion of the variability in our response variable (Murder Rate per 100K in these 5 countries) that is accounted for by our regression model (lm_totalcountry), which came out to be 0.0761. So, 7.61% of the variation in Murders per 100K people in these 5 countries can be explained by the Sustainable Development Index (SDI) for the countries, while the remaining 92.39% is due to other factors or random variation. This further suggests that our model is low quality, and that the SDI does not explain the variability in Murders per 100K very well.
+To check this, we also observed the R-squared value, which is the proportion of the variability in our response variable (Murder Rate per 100K in these 5 countries) that is accounted for by our regression model (lm_totalcountry), which came out to be 0.0761. So, 7.61% of the variation in Murders per 100K people in these 5 countries can be explained by the Sustainable Development Index (SDI) for the countries, while the remaining 92.39% is due to other factors or random variation. This further suggests that our model is low quality, and that the SDI does not explain the variability in Murders per 100K very well.
 
 ```{r}
 noise <- function(x, mean = 0, sd){
@@ -434,6 +435,12 @@ SimDistribution(lm_germany, 1, "Germany")
 SimDistribution(lm_singapore, 1, "Singapore")
 SimDistribution(lm_japan, 1, "Japan")
 ```
+
+Shown above are two histograms for each country, representing the simulated murder rate per 100K and observed murder rate per 100K for each country. For the overall observed versus overall simulated histograms, we can see that there is a much wider spread in the simulated data, with the mean centered around 3, multiple peaks at 1, 3, and 5, and a slight left skew. The observed data for overall countries has a mean that is much more concentrated around 1, and few data points around 6-10, creating a right skew. 
+
+For each individual countries simulated distribution histograms, we see a much smaller spread of data, with the US having a mean centered around 6 and right skew, Australia having a mean centered around 2, and Germany, Singapore, and Japan having their mean's at 1. These individual histograms help explain why the overall simulated histogram has peaks at 1, 3, and 5.
+
+The observed data for each of these countries and the overall countries all appear the same? 
 
 ```{r}
 #3.2 Done in Basic way according to textbook
