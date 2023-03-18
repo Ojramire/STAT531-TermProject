@@ -199,7 +199,7 @@ plot_builder <- function(df, countryfilter, colorfilter){
     geom_smooth(method = "lm",
               color = "black",
               size = 0.675) + 
-    labs(title = "United States",
+    labs(title = glue(countryfilter, " Linear Regression Plot"),
          subtitle = "Murder Rate per 100K") + 
     theme(axis.title.y = element_blank(),
           plot.title.position = "plot") + 
@@ -407,7 +407,6 @@ sim_response <- tibble(sim_MR = noise(countrypredict,
                                       sd = countryerror)
                    )
 
-
 obs_p <- data_clean %>% 
   ggplot(aes(x=`Murder Rate per 100K`)) +
   geom_histogram(binwidth = bin) +
@@ -429,13 +428,15 @@ return(new_p+obs_p)
 
 }
 SimDistribution(lm_totalcountry, 1, "Overall")
-SimDistribution(lm_us, 0.2, "US")
-SimDistribution(lm_australia, 0.2, "Australia")
+SimDistribution(lm_us, 1, "US")
+SimDistribution(lm_australia, 1, "Australia")
+SimDistribution(lm_germany, 1, "Germany")
+SimDistribution(lm_singapore, 1, "Singapore")
+SimDistribution(lm_japan, 1, "Japan")
 ```
 
 ```{r}
 #3.2 Done in Basic way according to textbook
-#Feel free to refine/fix/functionize
 
 sims <- function(lm, nsims){
 countryerror <- sigma(lm)
@@ -450,6 +451,7 @@ colnames(simdata) <- colnames(simdata) %>%
                   replace = "_")
 return(simdata)
 }
+
 us_sim <- sims(lm_us, 1000)
 us_sims <- data_clean %>%  
   filter(country=="United States") %>% 
