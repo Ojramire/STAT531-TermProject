@@ -485,7 +485,7 @@ colnames(simdata) <- colnames(simdata) %>%
 return(simdata)
 }
 
-sims(lm_totalcountry, 1000)
+
 
 Rsim <- function(lm, nsims, df, countryfilter, colorfilter){
 country_sim <- sims(lm, nsims)
