@@ -489,13 +489,13 @@ return(simdata)
 
 Rsim <- function(lm, nsims, df, countryfilter, colorfilter){
 country_sim <- sims(lm, nsims)
-country_sims <- df %>%  
-  filter(country == countryfilter) %>% 
-  select(`Murder Rate per 100K`) %>%  
+
+country_sims <- df %>% 
   ungroup() %>% 
+  na.omit() %>% 
+  select(`Murder Rate per 100K`) %>%  
   bind_cols(country_sim)
-  select(!is.na(country))
-country_sims
+
 
 sim_r_sq <- country_sims %>%  
   map(~ lm(`Murder Rate per 100K` ~ .x, data = country_sims)) %>%  
@@ -515,6 +515,7 @@ tibbleplot <- tibble(country_sims = sim_r_sq) %>%
 return(tibbleplot)
 }
 
+data_clean
 Rsim(lm_totalcountry, 1000, data_clean, "Overall", "black")
 Rsim(lm_us, 1000, data_us, "United States", "#F8766D")
 Rsim(lm_australia, 1000, data_australia, "Australia", "#A3A500")
@@ -525,6 +526,7 @@ Rsim(lm_japan, 1000, data_japan, "Japan", "#E76BF3") +
                   theme = theme(plot.caption = element_text(hjust = 0.5,
                                                             size = 11)))
 ```
+
 
 ## References:
 
