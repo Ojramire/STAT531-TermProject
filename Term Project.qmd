@@ -3,6 +3,8 @@ title: "Is Sustainable Development linked to Reduced Murder Rates?"
 author: "Grace Damaschino, Tyler Lopez, Oriana Ramirez, Daniel Seiler"
 self-contained: true
 editor: source
+  markdown: 
+    wrap: 72
 format: 
   html:
     self-contained: true
@@ -272,41 +274,41 @@ plot_lm_total +
                   )
 ```
 
-<center> **Total Regression Equation:** </center>
+<center>**Total Regression Equation:**</center>
+
 $$
 \hat{y}_{Murder Rate}=-0.04515x_{SDI}+3.94729
-$$ 
-For the total data, every unit increase in Sustainable Development Index results in a 0.04515 decrease in murder rate. Based on the intercept, with a SDI of 0, the murder rate would be around 3.94729 per 100k people.
+$$ For the total data, every unit increase in Sustainable Development Index results in a 0.04515 decrease in murder rate. Based on the intercept, with a SDI of 0, the murder rate would be around 3.94729 per 100k people.
 
-<center> **US Regression Equation:** </center>
+<center>**US Regression Equation:**</center>
+
 $$
 \hat{y}_{Murder Rate}=0.2016x_{SDI}+2.5978
-$$ 
-Looking to the US data, every unit increase in Sustainable Development Index results in a 0.2016 increase in murder rate. Based on the intercept, with a SDI of 0, the murder rate would be around 2.5978 per 100k people.
+$$ Looking to the US data, every unit increase in Sustainable Development Index results in a 0.2016 increase in murder rate. Based on the intercept, with a SDI of 0, the murder rate would be around 2.5978 per 100k people.
 
-<center> **Australia Regression Equation:** </center>
+<center>**Australia Regression Equation:**</center>
+
 $$
 \hat{y}_{Murder Rate}=0.04889x_{SDI}+0.27391
-$$ 
-For the Australia data, every unit increase in Sustainable Development Index results in a 0.04889 increase in murder rate. Based on the intercept, with a SDI of 0, the murder rate would be around 0.27391 per 100k people. 
+$$ For the Australia data, every unit increase in Sustainable Development Index results in a 0.04889 increase in murder rate. Based on the intercept, with a SDI of 0, the murder rate would be around 0.27391 per 100k people.
 
-<center> **Germany Regression Equation:** </center>
+<center>**Germany Regression Equation:**</center>
+
 $$
 \hat{y}_{Murder Rate}=0.04798x_{SDI}-2.08016
-$$ 
-Next up with the Germany data, every unit increase in Sustainable Development Index results in a 0.04798 increase in murder rate. Based on the intercept, with a SDI of 0, the murder rate would be around negative 2.08016 per 100k people, which is of course an impossible value. 
+$$ Next up with the Germany data, every unit increase in Sustainable Development Index results in a 0.04798 increase in murder rate. Based on the intercept, with a SDI of 0, the murder rate would be around negative 2.08016 per 100k people, which is of course an impossible value.
 
-<center> **Singapore Regression Equation:** </center>
+<center>**Singapore Regression Equation:**</center>
+
 $$
 \hat{y}_{Murder Rate}=0.02891 x_{SDI}-0.28529
-$$ 
-Moving on to the Singapore data, every unit increase in Sustainable Development Index results in a 0.02891 increase in murder rate. Based on the intercept, with a SDI of 0, the murder rate would be around -0.28529 per 100k people, which is of course impossible. 
+$$ Moving on to the Singapore data, every unit increase in Sustainable Development Index results in a 0.02891 increase in murder rate. Based on the intercept, with a SDI of 0, the murder rate would be around -0.28529 per 100k people, which is of course impossible.
 
-<center> **Japan Regression Equation:** </center>
+<center>**Japan Regression Equation:**</center>
+
 $$
 \hat{y}_{Murder Rate}=0.005984x_{SDI}-0.231561
-$$ 
-Ending with the Japan data, every unit increase in Sustainable Development Index results in a 0.005984 increase in murder rate. Based on the intercept, with a SDI of 0, the murder rate would be around -0.231561 per 100k people, which again is impossible. 
+$$ Ending with the Japan data, every unit increase in Sustainable Development Index results in a 0.005984 increase in murder rate. Based on the intercept, with a SDI of 0, the murder rate would be around -0.231561 per 100k people, which again is impossible.
 
 ### Model Fit
 
@@ -339,10 +341,10 @@ anova_japan <- ANOVA_formatter(lm_japan)
 ```
 
 ```{r}
-regfunction <- function(model, limit, country){
+regfunction <- function(model, limit, country, colorfilter){
 plot1 <-   augment(model) %>% 
   ggplot(aes(x=.fitted, y=.resid))+
-  geom_point()+
+  geom_point(color = colorfilter)+
   geom_hline(yintercept=0, linetype=2)+
   scale_y_continuous(limits=c(-limit, limit))+
   labs(x="Fitted Values", y="", subtitle="Residuals", title=glue(country, " Residual Plot"))
@@ -353,12 +355,12 @@ return(plot1)
 
 ```{r}
 #| fig-height: 20
-resid_total <- regfunction(lm_totalcountry, 8, "Overall")
-resid_us <- regfunction(lm_us, 0.75, "United States")
-resid_australia <- regfunction(lm_australia, 0.5, "Australia")
-resid_germany <- regfunction(lm_germany, 0.3, "Germany")
-resid_singapore <- regfunction(lm_singapore, 0.5, "Singapore")
-resid_japan <- regfunction(lm_japan, 0.2, "Japan")
+resid_total <- regfunction(lm_totalcountry, 8, "Overall", "black")
+resid_us <- regfunction(lm_us, 0.75, "United States", "#F8766D")
+resid_australia <- regfunction(lm_australia, 0.5, "Australia", "#A3A500")
+resid_germany <- regfunction(lm_germany, 0.3, "Germany", "#00BF7D")
+resid_singapore <- regfunction(lm_singapore, 0.5, "Singapore", "#00B0F6")
+resid_japan <- regfunction(lm_japan, 0.2, "Japan", "#E76BF3")
 
 
 resid_us / 
@@ -373,6 +375,7 @@ resid_us /
                                 )
                   )
 ```
+
 The variance of the models were also examined to determine their robustness. Table 2 contains the summarized variances for the responses, fitted values, and residuals.
 
 ```{r}
@@ -417,7 +420,7 @@ noise <- function(x, mean = 0, sd){
             sd)
 }
 
-SimDistribution <- function(lm, data, bin, countryname){
+SimDistribution <- function(lm, data, bin, countryname, colorfilter){
 countryerror <- sigma(lm)
 countrypredict <- predict(lm)
 sim_response <- tibble(sim_MR = noise(countrypredict, 
@@ -426,7 +429,7 @@ sim_response <- tibble(sim_MR = noise(countrypredict,
 
 obs_p <- data %>% 
   ggplot(aes(x=`Murder Rate per 100K`)) +
-  geom_histogram(binwidth = bin) +
+  geom_histogram(binwidth = bin, fill = colorfilter) +
   labs(title=glue(countryname, " Observed Distribution"), x = "Observed Murder Rate per 100K",
        y = "",
        subtitle = "Count") +
@@ -434,7 +437,7 @@ obs_p <- data %>%
   scale_x_continuous(limits=c(-10,15))
 new_p <- sim_response %>% 
   ggplot(aes(x = sim_MR)) +
-  geom_histogram(binwidth = bin) +
+  geom_histogram(binwidth = bin, fill = colorfilter) +
   labs(title=glue(countryname, " Simulated Distribution"), x = "Simulated Murder Rate per 100K",
        y = "",
        subtitle = "Count") +
@@ -445,65 +448,82 @@ return(new_p+obs_p)
 
 }
 
-SimDistribution(lm_totalcountry, data_clean, 1, "Overall")
-SimDistribution(lm_us, data_us, 1, "United States")
-SimDistribution(lm_australia, data_australia, 1, "Australia")
-SimDistribution(lm_germany, data_germany, 1, "Germany")
-SimDistribution(lm_singapore, data_singapore, 1, "Singapore")
-SimDistribution(lm_japan, data_japan, 1, "Japan")
+SimDistribution(lm_totalcountry, data_clean, 1, "Overall", "black")
+SimDistribution(lm_us, data_us, 0.6, "United States", "#F8766D")
+SimDistribution(lm_australia, data_australia, 0.2, "Australia", "#A3A500")
+SimDistribution(lm_germany, data_germany, 0.2, "Germany", "#00BF7D")
+SimDistribution(lm_singapore, data_singapore, 0.2, "Singapore", "#00B0F6")
+SimDistribution(lm_japan, data_japan, 0.2, "Japan", "#E76BF3") +
+  plot_annotation(caption = "Figure 6. Observed data versus simulated data distribution plots \nfor all individual countries and of combined countries.",
+                  theme = theme(plot.caption = element_text(hjust = 0.5,
+                                                            size = 11)))
 ```
 
 The SimDistribution function, which uses the linear models created for each country, the datasets created for each country, and a bin of 1, was used to plot each of the histograms shown above. A noise function, which randomly generates noise using an input (x), mean, and standard deviation (sd), was then used to create the simulated histograms for each country within the SimDistribution function, and plot those as well. The simulated and observed data for each country, as well as overall, are presented side by side in the histograms above. These represent the simulated and observed murder rate per 100K for each country.
 
-For the overall observed versus overall simulated histograms, one can see that there is a much wider spread in the simulated data, with the mean centered around 3, multiple peaks at -2, 1, 2, 4, and 7, and a slight left skew. The observed data for overall countries has a mean that is concentrated around 1, and few data points around 6-10, creating a right skew. 
+For the overall observed versus overall simulated histograms, one can see that there is a much wider spread in the simulated data, with the mean centered around 3, multiple peaks at -2, 1, 2, 4, and 7, and a slight left skew. The observed data for overall countries has a mean that is concentrated around 1, and few data points around 6-10, creating a right skew.
 
 For each individual countries simulated distribution histograms, we see a much smaller spread of data: The simulated US has a mean centered around 7 and slight right skew, Australia having a mean centered around 2, and Germany, Singapore, and Japan having their mean's at 1. These individual simulated histograms help explain why the overall simulated histogram has peaks at 1, 2, and 7.
 
-The observed histograms for each of these countries and the overall countries have smaller spreads around their means, with the observed overall histogram having peaks around 1 and a right skew, and the US having peaks at 6 and 10 with a slight right skew. The observed plots for Australia, Germany, Singapore, and Japan look very similar to their simulated plots, with peaks at 2, 1, 1, and 1, respectively. 
+The observed histograms for each of these countries and the overall countries have smaller spreads around their means, with the observed overall histogram having peaks around 1 and a right skew, and the US having peaks at 6 and 10 with a slight right skew. The observed plots for Australia, Germany, Singapore, and Japan look very similar to their simulated plots, with peaks at 2, 1, 1, and 1, respectively.
 
-From these side by side comparisons of observed versus simulated data, one can observe that for each individual country, the simulated data yields similar results as the observed data. However, for the overall countries, the simulated data might be slightly misleading due to it looking more different from the actual observed histogram. 
+From these side by side comparisons of observed versus simulated data, one can observe that for each individual country, the simulated data yields similar results as the observed data. However, for the overall countries, the simulated data might be slightly misleading due to it looking more different from the actual observed histogram.
 
 ```{r}
 #3.2 Done in Basic way according to textbook
+# I don't know how to fix the binding error
 
 sims <- function(lm, nsims){
 countryerror <- sigma(lm)
 countrypredict <- predict(lm)
 simdata <- map_dfc(.x = 1:nsims,
-                .f = ~ tibble(sim = noise(countrypredict, 
-                                          sd = countryerror)
-                              )
-                )
+                   .f = ~ tibble(sim = noise(countrypredict,
+                                             sd = countryerror)
+                                 )
+                   )
 colnames(simdata) <- colnames(simdata) %>% 
   str_replace(pattern = "\\.\\.\\.",
                   replace = "_")
 return(simdata)
 }
 
-us_sim <- sims(lm_us, 1000)
-us_sims <- data_clean %>%  
-  filter(country=="United States") %>% 
+Rsim <- function(lm, nsims, df, countryfilter, colorfilter){
+country_sim <- sims(lm, nsims)
+country_sims <- df %>%  
+  filter(country == countryfilter) %>% 
   select(`Murder Rate per 100K`) %>%  
   ungroup() %>% 
-  bind_cols(us_sim) %>% 
-  select(!country)
-us_sims
-sim_r_sq <- us_sims %>%  
-  map(~ lm(`Murder Rate per 100K` ~ .x, data = us_sims)) %>%  
+  bind_cols(country_sim)
+  select(!is.na(country))
+country_sims
+
+sim_r_sq <- country_sims %>%  
+  map(~ lm(`Murder Rate per 100K` ~ .x, data = country_sims)) %>%  
   map(glance) %>%  
   map_dbl(~ .x$r.squared)
 
 sim_r_sq <- sim_r_sq[names(sim_r_sq) != "Murder Rate per 100K"]
 
-
-tibble(us_sims = sim_r_sq) %>%  
-  ggplot(aes(x = us_sims)) + 
-  geom_histogram(binwidth = 0.025) +
+tibbleplot <- tibble(country_sims = sim_r_sq) %>%  
+  ggplot(aes(x = country_sims)) + 
+  geom_histogram(binwidth = 0.025, fill = colorfilter) +
   labs(x = expression("Simulated"~ R^2),
        y = "",
        subtitle = "Number of Simulated Models") +
   theme_bw()
 
+return(tibbleplot)
+}
+
+Rsim(lm_totalcountry, 1000, data_clean, "Overall", "black")
+Rsim(lm_us, 1000, data_us, "United States", "#F8766D")
+Rsim(lm_australia, 1000, data_australia, "Australia", "#A3A500")
+Rsim(lm_germany, 1000, data_germany, "Germany", "#00BF7D")
+Rsim(lm_singapore, 1000, data_singapore, "Singapore", "#00B0F6")
+Rsim(lm_japan, 1000, data_japan, "Japan", "#E76BF3") +
+  plot_annotation(caption = "Figure 7. Distribution of R squared values of all individual countries and of combined countries.",
+                  theme = theme(plot.caption = element_text(hjust = 0.5,
+                                                            size = 11)))
 ```
 
 ## References:
@@ -511,4 +531,3 @@ tibble(us_sims = sim_r_sq) %>%
 Sustainable Development Index. (2019). Gapminder. <https://www.gapminder.org/data/> 
 
 Methodology and Data. (n.d.). SUSTAINABLE DEVELOPMENT INDEX. <https://www.sustainabledevelopmentindex.org/methods.> 
-
