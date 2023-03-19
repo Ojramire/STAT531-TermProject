@@ -1,0 +1,543 @@
+---
+title: "Is Sustainable Development linked to Reduced Murder Rates?"
+author: "Grace Damaschino, Tyler Lopez, Oriana Ramirez, Daniel Seiler"
+self-contained: true
+editor: source
+format: 
+  html:
+    self-contained: true
+    code-fold: true
+    code-tools: true
+    toc: true
+execute: 
+  echo: true
+  warning: false
+  message: false
+  error: true
+---
+
+## Introduction
+
+Our analysis will be on the relationship between the murder rate per 100,000 people and the sustainability development index, in multiple countries throughout the world. Two quantitative datasets titled "Murders (per 100,000 people)" and "Sustainable Development Index" were found on Gapminder. The Murders (per 100,000 people) dataset contains information on mortality per 100,000 people for 118 countries between 1949 to 2015. The mortality rate was adjusted by standard population and age so that all countries in the dataset have the same age composition of the population. The Sustainable Development Index dataset contains an efficiency metric for 165 countries between 1989 to 2018. The Sustainability Development Index (SDI) is a metric based on a Human Development Index (HDI) and an Ecological Impact Index. The human development index is the geometric mean of life expectancy, education, and modified income indices (Figure 1), while the ecological impact index (Figure 2) is based on the "extent to which consumption-based CO2 emissions and material footprint exceed per-capita shares of planetary boundaries" (Sustainable Development Index, 2019).
+
+![](images/HDI.png){fig-align="center"}
+
+Figure 1. HDI formula based on the geometric mean of life expectancy, education, and modified income indices. MYSI is the Mean Years of Schooling Index, EYSI is the Expected Years of Schooling Index, and GNI is Gross National Income (Methodology and Data, n.d.).
+
+![](images/SDI.png){fig-align="center"}
+
+Figure 2. Ecological Impact Index formula based on the Average Overshoot (AO) of material footprint (MF) and CO2 emissions.
+
+### Hypothesis
+
+We would hypothesize that the sustainability development index is strongly negatively correlated with murder rate, due to the wide variety of factors (as discussed above) that play into the sustainable development index. The sustainable development index is as much a measure of well-being and progress as it is sustainability, as a result of this we would expect a rise in murder rate to correspond with a drop in SDI. In terms of limitations of our regression model, we would also hypothesize that due to the wide net cast by the sustainable development index, there may be significant confounding variables or even possible redundancies limiting the applications of this analysis. For instance, SDI is calculated in large part from HDI, HDI incorporates life expectancy into their data, and a high murder rate would result in some reduction of life expectancy, thus reducing the SDI ranking directly.
+
+## Data Selection and Manipulation
+
+```{r setup}
+#| message: FALSE
+library(tidyverse)
+library(car)
+library(here)
+library(readr)
+library(DT)
+library(ggpubr)
+library(patchwork)
+library(broom)
+library(glue)
+
+#| message: FALSE
+murder_RAW <- read_csv(here::here("murder_per_100000_people.csv"))
+SDI_RAW <- read_csv(here::here("sdi.csv"))
+```
+
+```{r}
+#Initial separate data treatment to adjust dataframes to the same column dimensions.
+
+murder <- murder_RAW |> 
+  select("country", "1989":"2006") |> 
+  pivot_longer(cols = "1989":"2006",
+               names_to = "year",
+               values_to = "Murder Rate per 100K")|>
+  mutate(year = as.numeric(year))
+
+SDI <- SDI_RAW |> 
+  select("country", "1989":"2006") |> 
+  pivot_longer(cols = "1989":"2006",
+               names_to = "year",
+               values_to = "Sustainable Development Index")|>
+  mutate(year = as.numeric(year))
+
+#Both dataframes joined for further treatment.
+
+data_RAW <- inner_join(murder, SDI)
+```
+
+```{r}
+data_opt <- data_RAW |>
+  group_by(country) |>
+  mutate(NA_percent = sum(is.na(across("Murder Rate per 100K":"Sustainable Development Index")))/36) |>
+
+# Remove all countries with more than 10% NAs
+  filter(NA_percent < 0.1)
+```
+
+::: callout-warning
+### Country Selection
+
+Here is the full list of eligible countries for analysis, spanning from 1989 to 2006 (the last year where the US has data). If we had choosen not to analyze the US, then this data set could have be extended to the early/mid 2010s since many of these countries have datapoints during that time period.
+
+```{r}
+data_opt |> 
+  distinct(country) |> 
+  pull(country)
+```
+:::
+
+Ultimately, five countries were selected for analysis - the United States, Australia, Germany, Singapore, and Japan due to their diverse geographical locations.
+
+```{r}
+select_countries <- c("United States", "Australia", "Germany", "Singapore", "Japan")  # Final list of countries chosen for analysis
+
+
+
+
+
+data_clean <- data_opt |>
+  filter(country %in% select_countries) |>
+  select(country:"Sustainable Development Index")
+datatable(data_clean, class = 'cell-border stripe', rownames = FALSE)
+
+data_us <- data_clean %>% 
+  filter(country=="United States")
+data_australia <- data_clean %>% 
+  filter(country=="Australia")
+data_germany <- data_clean %>% 
+  filter(country=="Germany")
+data_singapore <- data_clean %>% 
+  filter(country=="Singapore")
+data_japan <- data_clean %>% 
+  filter(country=="Japan")
+```
+
+## Regression Analysis
+
+The analysis for this data set will be performed at two different levels. The first is five separate linear regression analyses for each of the countries selected. The second is a single regression analysis for all five countries combined. In the following graphs, Figure 1 captures the overall SDI versus murder rate for all countries, while Figure 2 plots both variables separately over time for the countries.
+
+```{r}
+data_clean |>
+  ggplot(aes(x = `Sustainable Development Index`, y = `Murder Rate per 100K`)) +
+  geom_point(aes(color = fct_reorder(country, `Murder Rate per 100K`, .desc = TRUE, na.rm = TRUE))) +
+  labs(x = "Sustainable Development Index (SDI)", 
+       y = "", subtitle = "Murder Rate per 100K", 
+       caption = "Figure 1. Relationship between SDI and Murder Rate per 100k for all 5 selected countries.") +
+  theme(plot.title.position = "plot",
+        plot.caption = element_text(hjust = 0.5,
+                                    size = 11)) +
+  guides(color = guide_legend(title = "Country"))
+```
+
+```{r}
+fig.align = 'center' 
+
+SDI_plot <- data_clean |>
+  ggplot(aes(x = year, 
+             y = `Sustainable Development Index`)) +
+  geom_line(aes(color = fct_reorder(country, `Murder Rate per 100K`, .desc = TRUE, na.rm = TRUE))) +
+  labs(x = "Year", 
+       y = "", 
+       subtitle = "Sustainable Development Index \n(SDI)") +
+  theme(legend.position = "none",
+        plot.title.position = "plot")
+
+
+murder_plot <- data_clean |>
+  ggplot(aes(x = year, 
+             y = `Murder Rate per 100K`)) +
+  geom_line(aes(color = fct_reorder(country, `Murder Rate per 100K`, .desc = TRUE, na.rm = TRUE))) +
+  labs(x = "Year", 
+       y = "", 
+       subtitle = "Murder Rate per 100K") +
+  theme(plot.title.position = "plot") +
+  guides(color = guide_legend(title = "Country"))
+
+SDI_plot + 
+  murder_plot + 
+  plot_annotation(caption = "Figure 2. Sustainable Development Index and Murder Rate per 100K from 1989 to 2006.",
+                  theme = theme(plot.caption = element_text(hjust = 0.5,
+                                                            size = 11)
+                                )
+                  )
+```
+
+From Figure 1, we can see that there is a moderate-strong positive linear relationship between our variables, meaning that for all the countries, as the sustainable development index (SDI) increases, so do murder rates. Unlike the rest, the relationship for Japan is just barely positive, bordering having no slope. The positive relationships between the two variables is interesting, because initially we predicted a negative relationship, where as SDI increased murder rates would decrease.
+
+Regarding Figure 2, we can observe that both SDI and murder rates have been going down for each country over the years. This is also interesting to see because, again, we would expect that murder rates would be rising as SDI has been decreasing, but this is not what we are observing here.
+
+### Linear Regression
+
+A linear regression model was first constructed within each country. The explanatory variable for each model is the country's SDI, while the response is the country's Murder Rate per 100K. Figure 3 displays all of the countries, though take note of the different axis scales used for each one.
+
+```{r}
+lm_builder <- function(country_filter, df){
+  df_clean <- df |> 
+    filter(country == country_filter)
+  
+  country_lm <- lm(`Murder Rate per 100K` ~ `Sustainable Development Index`,
+                   data = df_clean)
+  
+  return(country_lm)
+}
+```
+
+```{r}
+#| fig-height: 16
+lm_totalcountry <- lm(`Murder Rate per 100K` ~ `Sustainable Development Index`,
+                    data = data_clean
+                    )
+
+lm_us <- lm_builder("United States", data_clean)
+lm_australia <- lm_builder("Australia", data_clean)
+lm_germany <- lm_builder("Germany", data_clean)
+lm_singapore <- lm_builder("Singapore", data_clean)
+lm_japan <- lm_builder("Japan", data_clean)
+```
+
+```{r}
+plot_builder <- function(df, countryfilter, colorfilter){
+  df_clean <- df |> 
+    filter(country == countryfilter) |> 
+    ggplot(aes(x = `Sustainable Development Index`,
+               y = `Murder Rate per 100K`)
+           ) + 
+    geom_point(color = colorfilter) + 
+    geom_smooth(method = "lm",
+              color = "black",
+              size = 0.675) + 
+    labs(title = glue(countryfilter, " Linear Regression Plot"),
+         subtitle = "Murder Rate per 100K") + 
+    theme(axis.title.y = element_blank(),
+          plot.title.position = "plot") + 
+    stat_regline_equation(label.x = -Inf, label.y = Inf, vjust = 1.5, hjust = -0.1, size = 3) + 
+    stat_cor(label.x = -Inf, label.y = Inf, vjust = 3, hjust = -0.1, size = 3)
+}
+```
+
+```{r}
+#| fig-height: 16
+plot_lm_us <- plot_builder(data_clean, "United States", "#F8766D")
+plot_lm_australia <- plot_builder(data_clean, "Australia", "#A3A500")
+plot_lm_germany <- plot_builder(data_clean, "Germany", "#00BF7D")
+plot_lm_singapore <- plot_builder(data_clean, "Singapore", "#00B0F6")
+plot_lm_japan <- plot_builder(data_clean, "Japan", "#E76BF3")
+
+plot_lm_us / 
+  plot_lm_australia / 
+  plot_lm_germany / 
+  plot_lm_singapore / 
+  plot_lm_japan + 
+  plot_annotation(caption = "Figure 3. Individual linear regression models applied to country data.",
+                  theme = theme(plot.caption = element_text(hjust = 0.5,
+                                                            size = 11)
+                                )
+                  )
+```
+
+For all countries combined, all SDI values were fed into the model. Figure 4 shows that the countries as a whole exhibit a negative trend. Though the countries have been grouped by color, their values were all fed into the model without the grouping.
+
+```{r}
+# Total Country Plot ------------------------------ #
+plot_lm_total <- data_clean |>
+  ggplot(aes(x = `Sustainable Development Index`, 
+           y = `Murder Rate per 100K`)
+       ) +
+  geom_point(aes(color = fct_reorder(country, `Murder Rate per 100K`, .desc = TRUE, na.rm = TRUE))) +
+  geom_smooth(method = "lm",
+              color = 'black',
+              size = 1) + 
+  labs(title = 'All Countries',
+       subtitle = "Murder Rate per 100K") + 
+  theme(axis.title.y = element_blank(),
+        plot.title.position = "plot") + 
+  stat_regline_equation(label.x = -Inf, label.y = Inf, vjust = 1.5, hjust = -0.1, size = 3) + 
+  stat_cor(label.x = -Inf, label.y = Inf, vjust = 3, hjust = -0.1, size = 3) +
+  guides(color = guide_legend(title = "Country"))
+
+
+plot_lm_total + 
+  plot_annotation(caption = "Figure 4. Overall model with countries combined.",
+                  theme = theme(plot.caption = element_text(hjust = 0.5,
+                                                            size = 11)
+                                )
+                  )
+```
+
+<center>**Total Regression Equation:**</center>
+
+$$
+\hat{y}_{Murder Rate}=-0.04515x_{SDI}+3.94729
+$$ For the total data, every unit increase in Sustainable Development Index results in a 0.04515 decrease in murder rate. Based on the intercept, with a SDI of 0, the murder rate would be around 3.94729 per 100k people.
+
+<center>**US Regression Equation:**</center>
+
+$$
+\hat{y}_{Murder Rate}=0.2016x_{SDI}+2.5978
+$$ Looking to the US data, every unit increase in Sustainable Development Index results in a 0.2016 increase in murder rate. Based on the intercept, with a SDI of 0, the murder rate would be around 2.5978 per 100k people.
+
+<center>**Australia Regression Equation:**</center>
+
+$$
+\hat{y}_{Murder Rate}=0.04889x_{SDI}+0.27391
+$$ For the Australia data, every unit increase in Sustainable Development Index results in a 0.04889 increase in murder rate. Based on the intercept, with a SDI of 0, the murder rate would be around 0.27391 per 100k people.
+
+<center>**Germany Regression Equation:**</center>
+
+$$
+\hat{y}_{Murder Rate}=0.04798x_{SDI}-2.08016
+$$ Next up with the Germany data, every unit increase in Sustainable Development Index results in a 0.04798 increase in murder rate. Based on the intercept, with a SDI of 0, the murder rate would be around negative 2.08016 per 100k people, which is of course an impossible value.
+
+<center>**Singapore Regression Equation:**</center>
+
+$$
+\hat{y}_{Murder Rate}=0.02891 x_{SDI}-0.28529
+$$ Moving on to the Singapore data, every unit increase in Sustainable Development Index results in a 0.02891 increase in murder rate. Based on the intercept, with a SDI of 0, the murder rate would be around -0.28529 per 100k people, which is of course impossible.
+
+<center>**Japan Regression Equation:**</center>
+
+$$
+\hat{y}_{Murder Rate}=0.005984x_{SDI}-0.231561
+$$ Ending with the Japan data, every unit increase in Sustainable Development Index results in a 0.005984 increase in murder rate. Based on the intercept, with a SDI of 0, the murder rate would be around -0.231561 per 100k people, which again is impossible.
+
+### Model Fit
+
+With the linear regression equations formed, the next task to perform was a review of the model fit. Plots of the residuals for each model were constructed as shown in Figure 5.
+
+```{r}
+ANOVA_formatter <- function(model){
+  
+  ANOVA_table <- tidy(anova(model))
+  ANOVA_table_clean <- ANOVA_table |> 
+    select(-statistic) |> 
+    rename("Response Variable US" = "term",
+           "Degrees of Freedom" = "df",
+           "Sum of Squares" = "sumsq",
+           "Sum of Squares" = "sumsq",
+           "Mean Squared Error" = "meansq",
+           "P-Value" = "p.value") |>
+    mutate(RMSE = sqrt(`Mean Squared Error`))
+  
+  return(ANOVA_table_clean)
+}
+```
+
+```{r}
+anova_us <- ANOVA_formatter(lm_us)
+anova_australia <- ANOVA_formatter(lm_australia)
+anova_germany <- ANOVA_formatter(lm_germany)
+anova_singapore <- ANOVA_formatter(lm_singapore)
+anova_japan <- ANOVA_formatter(lm_japan)
+```
+
+```{r}
+regfunction <- function(model, limit, country, colorfilter){
+plot1 <-   augment(model) %>% 
+  ggplot(aes(x=.fitted, y=.resid))+
+  geom_point(color = colorfilter)+
+  geom_hline(yintercept=0, linetype=2)+
+  scale_y_continuous(limits=c(-limit, limit))+
+  labs(x="Fitted Values", y="", subtitle="Residuals", title=glue(country, " Residual Plot"))
+
+return(plot1)
+}
+```
+
+```{r}
+#| fig-height: 20
+resid_total <- regfunction(lm_totalcountry, 8, "Overall", "black")
+resid_us <- regfunction(lm_us, 0.75, "United States", "#F8766D")
+resid_australia <- regfunction(lm_australia, 0.5, "Australia", "#A3A500")
+resid_germany <- regfunction(lm_germany, 0.3, "Germany", "#00BF7D")
+resid_singapore <- regfunction(lm_singapore, 0.5, "Singapore", "#00B0F6")
+resid_japan <- regfunction(lm_japan, 0.2, "Japan", "#E76BF3")
+
+
+resid_us / 
+  resid_australia /
+  resid_germany /
+  resid_singapore /
+  resid_japan / 
+  resid_total + 
+  plot_annotation(caption = "Figure 5. Residual plots of all individual countries and of combined countries.",
+                  theme = theme(plot.caption = element_text(hjust = 0.5,
+                                                            size = 11)
+                                )
+                  )
+```
+
+The variance of the models were also examined to determine their robustness. Table 2 contains the summarized variances for the responses, fitted values, and residuals.
+
+```{r}
+augment_total <- augment(lm_totalcountry)
+augment_us <- augment(lm_us)
+augment_aus <- augment(lm_australia)
+augment_ger <- augment(lm_germany)
+augment_sing <- augment(lm_singapore)
+augment_jp <- augment(lm_japan)
+
+Regression <- c("Total", "United States", "Australia", "Germany", "Singapore", "Japan")
+Response_variability <- c(var(augment_total$`Murder Rate per 100K`),
+                          var(augment_us$`Murder Rate per 100K`),
+                          var(augment_aus$`Murder Rate per 100K`),
+                          var(augment_ger$`Murder Rate per 100K`),
+                          var(augment_sing$`Murder Rate per 100K`),
+                          var(augment_jp$`Murder Rate per 100K`))
+
+Fitted_variability <- c(var(augment_total$.fitted), var(augment_us$.fitted), var(augment_aus$.fitted), var(augment_ger$.fitted), var(augment_sing$.fitted), var(augment_jp$.fitted))
+
+residual_variability <- c(var(augment_total$.resid), var(augment_us$.resid), var(augment_aus$.resid), var(augment_ger$.resid), var(augment_sing$.resid), var(augment_jp$.resid))
+
+Variability <- data.frame(Regression, Response_variability, Fitted_variability, residual_variability)
+
+Column_names <- c("Regression Model", "Response Variance", "Fitted Variance", "Residual Variance")
+library(kableExtra)
+kable(x = Variability, 
+      col.names = Column_names,
+      caption = "<center>Table 2. Variances of the linear regression models.</center>") %>% 
+  kable_classic_2()
+
+```
+
+Our residual variance for our model (lm_totalcountry) is 7.62. When you then divide the residual variance (7.62) over the response variance (8.25), you get 92.36%. This is the amount of unexplained variability in Murders that is not accounted for by SDI in the model. This indicates that the model is doing a poor job of explaining the variability in the response variable.
+
+To check this, we also observed the R-squared value, which is the proportion of the variability in our response variable (Murder Rate per 100K in these 5 countries) that is accounted for by our regression model (lm_totalcountry), which came out to be 0.0761. So, 7.61% of the variation in Murders per 100K people in these 5 countries can be explained by the Sustainable Development Index (SDI) for the countries, while the remaining 92.39% is due to other factors or random variation. This further suggests that our model is low quality, and that the SDI does not explain the variability in Murders per 100K very well.
+
+```{r}
+noise <- function(x, mean = 0, sd){
+  x + rnorm(length(x), 
+            mean, 
+            sd)
+}
+
+SimDistribution <- function(lm, data, bin, countryname, colorfilter){
+countryerror <- sigma(lm)
+countrypredict <- predict(lm)
+sim_response <- tibble(sim_MR = noise(countrypredict, 
+                                      sd = countryerror)
+                   )
+
+obs_p <- data %>% 
+  ggplot(aes(x=`Murder Rate per 100K`)) +
+  geom_histogram(binwidth = bin, fill = colorfilter) +
+  labs(title=glue(countryname, " Observed Distribution"), x = "Observed Murder Rate per 100K",
+       y = "",
+       subtitle = "Count") +
+  theme_bw()+
+  scale_x_continuous(limits=c(-10,15))
+new_p <- sim_response %>% 
+  ggplot(aes(x = sim_MR)) +
+  geom_histogram(binwidth = bin, fill = colorfilter) +
+  labs(title=glue(countryname, " Simulated Distribution"), x = "Simulated Murder Rate per 100K",
+       y = "",
+       subtitle = "Count") +
+  theme_bw()+
+  scale_x_continuous(limits=c(-10, 15))
+  
+return(new_p+obs_p)
+
+}
+
+SimDistribution(lm_totalcountry, data_clean, 1, "Overall", "black")
+SimDistribution(lm_us, data_us, 0.6, "United States", "#F8766D")
+SimDistribution(lm_australia, data_australia, 0.2, "Australia", "#A3A500")
+SimDistribution(lm_germany, data_germany, 0.2, "Germany", "#00BF7D")
+SimDistribution(lm_singapore, data_singapore, 0.2, "Singapore", "#00B0F6")
+SimDistribution(lm_japan, data_japan, 0.2, "Japan", "#E76BF3") +
+  plot_annotation(caption = "Figure 6. Observed data versus simulated data distribution plots \nfor all individual countries and of combined countries.",
+                  theme = theme(plot.caption = element_text(hjust = 0.5,
+                                                            size = 11)))
+```
+
+The SimDistribution function, which uses the linear models created for each country, the datasets created for each country, and a bin of 1, was used to plot each of the histograms shown above. A noise function, which randomly generates noise using an input (x), mean, and standard deviation (sd), was then used to create the simulated histograms for each country within the SimDistribution function, and plot those as well. The simulated and observed data for each country, as well as overall, are presented side by side in the histograms above. These represent the simulated and observed murder rate per 100K for each country.
+
+For the overall observed versus overall simulated histograms, one can see that there is a much wider spread in the simulated data, with the mean centered around 3, multiple peaks at -2, 1, 2, 4, and 7, and a slight left skew. The observed data for overall countries has a mean that is concentrated around 1, and few data points around 6-10, creating a right skew.
+
+For each individual countries simulated distribution histograms, we see a much smaller spread of data: The simulated US has a mean centered around 7 and slight right skew, Australia having a mean centered around 2, and Germany, Singapore, and Japan having their mean's at 1. These individual simulated histograms help explain why the overall simulated histogram has peaks at 1, 2, and 7.
+
+The observed histograms for each of these countries and the overall countries have smaller spreads around their means, with the observed overall histogram having peaks around 1 and a right skew, and the US having peaks at 6 and 10 with a slight right skew. The observed plots for Australia, Germany, Singapore, and Japan look very similar to their simulated plots, with peaks at 2, 1, 1, and 1, respectively.
+
+From these side by side comparisons of observed versus simulated data, one can observe that for each individual country, the simulated data yields similar results as the observed data. However, for the overall countries, the simulated data might be slightly misleading due to it looking more different from the actual observed histogram.
+
+```{r}
+#3.2 Done in Basic way according to textbook
+# I don't know how to fix the binding error
+
+sims <- function(lm, nsims){
+countryerror <- sigma(lm)
+countrypredict <- predict(lm)
+simdata <- map_dfc(.x = 1:nsims,
+                   .f = ~ tibble(sim = noise(countrypredict,
+                                             sd = countryerror)
+                                 )
+                   )
+colnames(simdata) <- colnames(simdata) %>% 
+  str_replace(pattern = "\\.\\.\\.",
+                  replace = "_")
+return(simdata)
+}
+
+
+
+Rsim <- function(lm, nsims, df, countryfilter, colorfilter){
+country_sim <- sims(lm, nsims)
+
+country_sims <- df %>% 
+  ungroup() %>% 
+  na.omit() %>% 
+  select(`Murder Rate per 100K`) %>%  
+  bind_cols(country_sim)
+
+
+sim_r_sq <- country_sims %>%  
+  map(~ lm(`Murder Rate per 100K` ~ .x, data = country_sims)) %>%  
+  map(glance) %>%  
+  map_dbl(~ .x$r.squared)
+
+sim_r_sq <- sim_r_sq[names(sim_r_sq) != "Murder Rate per 100K"]
+
+tibbleplot <- tibble(country_sims = sim_r_sq) %>%  
+  ggplot(aes(x = country_sims)) + 
+  geom_histogram(binwidth = 0.025, fill = colorfilter) +
+  labs(title=glue(countryfilter, " R-Squared Distribution"), x = expression("Simulated"~ R^2),
+       y = "",
+       subtitle = "Number of Simulated Models") +
+  theme_bw()
+
+return(tibbleplot)
+}
+
+
+data_clean
+Rsim(lm_totalcountry, 1000, data_clean, "Overall", "black")
+Rsim(lm_us, 1000, data_us, "United States", "#F8766D")
+Rsim(lm_australia, 1000, data_australia, "Australia", "#A3A500")
+Rsim(lm_germany, 1000, data_germany, "Germany", "#00BF7D")
+Rsim(lm_singapore, 1000, data_singapore, "Singapore", "#00B0F6")
+Rsim(lm_japan, 1000, data_japan, "Japan", "#E76BF3") +
+  plot_annotation(caption = "Figure 7. Distribution of R squared values of all individual countries and of combined countries.",
+                  theme = theme(plot.caption = element_text(hjust = 0.5,
+                                                            size = 11)))
+```
+
+The above plots are created from simulations to generate visualizations of the distribution of R-squared values for each of the simulated models of murder rates in the specific countries. This is done by first generating simulated data by adding noise to predicted values, in the sims function. The Rsim function then combines this simulated data with the actual country's murder rate data, fitting the country's linear model to the simulated data, and then calculating the r-squared values and plotting it as a histogram. 
+
+R-squared value are a measure of how well a model fits the data, with values ranging from 0.00 to 1, and higher values indicating a better fit. From the above histograms, one can see that the mean r-squared values vary widely across the different countries, with some having values closer to 1 indicating a good fit, while others have values closer to 0 indicating a poor fit. 
+
+The mean r-squared value for the combined "overall" countries dataset is zero, indicating that this dataset has a very poor fit, further suggesting that our model is low quality, and that the SDI does not do a good job at explaining the variability in Murders per 100K. 
+
+
+
+## References:
+
+Sustainable Development Index. (2019). Gapminder. <https://www.gapminder.org/data/> 
+
+Methodology and Data. (n.d.). SUSTAINABLE DEVELOPMENT INDEX. <https://www.sustainabledevelopmentindex.org/methods.> 
