@@ -18,7 +18,7 @@ execute:
 
 ## Introduction
 
-Our analysis will be on the relationship between the murder rate per 100,000 people and the sustainability development index, in multiple countries throughout the world. Two quantitative datasets titled "Murders (per 100,000 people)" and "Sustainable Development Index" were found on Gapminder. The Murders (per 100,000 people) dataset contains information on mortality per 100,000 people for 118 countries between 1949 to 2015. The mortality rate was adjusted by standard population and age so that all countries in the dataset have the same age composition of the population. The Sustainable Development Index dataset contains an efficiency metric for 165 countries between 1989 to 2018. The Sustainability Development Index (SDI) is a metric based on a Human Development Index (HDI) and an Ecological Impact Index. The human development index is the geometric mean of life expectancy, education, and modified income indices (Figure 1), while the ecological impact index (Figure 2) is based on the "extent to which consumption-based CO2 emissions and material footprint exceed per-capita shares of planetary boundaries" (Sustainable Development Index, 2019).
+Our analysis is on the relationship between the murder rate per 100,000 people and the sustainability development index, in multiple countries throughout the world. Two quantitative datasets titled "Murders (per 100,000 people)" and "Sustainable Development Index" were found on Gapminder. The Murders (per 100,000 people) dataset contains information on mortality per 100,000 people for 118 countries between 1949 to 2015. The mortality rate was adjusted by standard population and age so that all countries in the dataset have the same age composition of the population. The Sustainable Development Index dataset contains an efficiency metric for 165 countries between 1989 to 2018. The Sustainability Development Index (SDI) is a metric based on a Human Development Index (HDI) and an Ecological Impact Index. The human development index is the geometric mean of life expectancy, education, and modified income indices (Figure 1), while the ecological impact index (Figure 2) is based on the "extent to which consumption-based CO2 emissions and material footprint exceed per-capita shares of planetary boundaries" (Sustainable Development Index, 2019).
 
 ![](images/HDI.png){fig-align="center"}
 
@@ -34,6 +34,8 @@ We would hypothesize that the sustainability development index is strongly negat
 
 ## Data Selection and Manipulation
 
+Before working with the downloaded datasets, we joined them based on country and year, then filtered out any countries that had more than 10% of there data as NA values. We cleaned our data this way since countries with more than 10% of there data being NA values, could have skewed results and may not be as accurate.
+
 ```{r setup}
 #| message: FALSE
 library(tidyverse)
@@ -45,6 +47,7 @@ library(ggpubr)
 library(patchwork)
 library(broom)
 library(glue)
+library(plotly)
 
 #| message: FALSE
 murder_RAW <- read_csv(here::here("murder_per_100000_people.csv"))
@@ -122,19 +125,14 @@ data_japan <- data_clean %>%
 
 ## Regression Analysis
 
-The analysis for this data set will be performed at two different levels. The first is five separate linear regression analyses for each of the countries selected. The second is a single regression analysis for all five countries combined. In the following graphs, Figure 1 captures the overall SDI versus murder rate for all countries, while Figure 2 plots both variables separately over time for the countries.
+The analysis for this data set was performed at two different levels. The first was five separate linear regression analyses for each of the countries selected. The second was a single regression analysis for all five countries combined. In the following graphs, Figure 1 captures the overall SDI versus murder rate for all countries, while Figure 2 plots both variables separately over time for the countries.
 
 ```{r}
-data_clean |>
-  ggplot(aes(x = `Sustainable Development Index`, y = `Murder Rate per 100K`)) +
-  geom_point(aes(color = fct_reorder(country, `Murder Rate per 100K`, .desc = TRUE, na.rm = TRUE))) +
-  labs(x = "Sustainable Development Index (SDI)", 
-       y = "", subtitle = "Murder Rate per 100K", 
-       caption = "Figure 1. Relationship between SDI and Murder Rate per 100k for all 5 selected countries.") +
-  theme(plot.title.position = "plot",
-        plot.caption = element_text(hjust = 0.5,
-                                    size = 11)) +
-  guides(color = guide_legend(title = "Country"))
+plot_ly(data = data_clean,
+        x = ~`Sustainable Development Index`, 
+        y = ~`Murder Rate per 100K`,
+        color = ~country, 
+        colors = c("#A3A500","#00BF7D","#E76BF3","#00B0F6","#F8766D"))
 ```
 
 ```{r}
@@ -170,7 +168,7 @@ SDI_plot +
                   )
 ```
 
-From Figure 1, we can see that there is a moderate-strong positive linear relationship between our variables, meaning that for all the countries, as the sustainable development index (SDI) increases, so do murder rates. Unlike the rest, the relationship for Japan is just barely positive, bordering having no slope. The positive relationships between the two variables is interesting, because initially we predicted a negative relationship, where as SDI increased murder rates would decrease.
+From Figure 1, we can see that there is a moderate-strong positive linear relationship between the variables, meaning that for all the countries, as the sustainable development index (SDI) increases so do murder rates. Unlike the rest, the relationship for Japan is just barely positive, bordering on having no slope. The positive relationships between the two variables is interesting, because initially we predicted a negative relationship, where as SDI increased murder rates would decrease.
 
 Regarding Figure 2, we can observe that both SDI and murder rates have been going down for each country over the years. This is also interesting to see because, again, we would expect that murder rates would be rising as SDI has been decreasing, but this is not what we are observing here.
 
@@ -457,7 +455,7 @@ SimDistribution(lm_japan, data_japan, 0.2, "Japan", "#E76BF3") +
                                                             size = 11)))
 ```
 
-The SimDistribution function, which uses the linear models created for each country, the datasets created for each country, and a bin of 1, was used to plot each of the histograms shown above. A noise function, which randomly generates noise using an input (x), mean, and standard deviation (sd), was then used to create the simulated histograms for each country within the SimDistribution function, and plot those as well. The simulated and observed data for each country, as well as overall, are presented side by side in the histograms above. These represent the simulated and observed murder rate per 100K for each country.
+The SimDistribution function, which uses the linear models created for each country, the datasets created for each country, and a choosen bin size, was used to plot each of the histograms shown above. A noise function, which randomly generates noise using an input (x), mean, and standard deviation (sd), was then used to create the simulated histograms for each country within the SimDistribution function, and plot those as well. The simulated and observed data for each country, as well as overall, are presented side by side in Figure 6. These represent the simulated and observed murder rate per 100K for each country.
 
 For the overall observed versus overall simulated histograms, one can see that there is a much wider spread in the simulated data, with the mean centered around 3, multiple peaks at -2, 1, 2, 4, and 7, and a slight left skew. The observed data for overall countries has a mean that is concentrated around 1, and few data points around 6-10, creating a right skew.
 
