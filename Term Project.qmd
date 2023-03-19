@@ -3,8 +3,6 @@ title: "Is Sustainable Development linked to Reduced Murder Rates?"
 author: "Grace Damaschino, Tyler Lopez, Oriana Ramirez, Daniel Seiler"
 self-contained: true
 editor: source
-  markdown: 
-    wrap: 72
 format: 
   html:
     self-contained: true
@@ -486,6 +484,8 @@ colnames(simdata) <- colnames(simdata) %>%
                   replace = "_")
 return(simdata)
 }
+
+sims(lm_totalcountry, 1000)
 
 Rsim <- function(lm, nsims, df, countryfilter, colorfilter){
 country_sim <- sims(lm, nsims)
