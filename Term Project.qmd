@@ -525,6 +525,11 @@ Rsim(lm_japan, 1000, data_japan, "Japan", "#E76BF3") +
                                                             size = 11)))
 ```
 
+The above plots are created from simulations to generate visualizations of the distribution of R-squared values for each of the simulated models of murder rates in the specific countries. This is done by first generating simulated data by adding noise to predicted values, in the sims function. The Rsim function then combines this simulated data with the actual country's murder rate data, fitting the country's linear model to the simulated data, and then calculating the r-squared values and plotting it as a histogram. 
+
+R-squared value are a measure of how well a model fits the data, with values ranging from 0.00 to 1, and higher values indicating a better fit. From the above histograms, one can see that the mean r-squared values vary widely across the different countries, with some having values closer to 1 indicating a good fit, while others have values closer to 0 indicating a poor fit. 
+
+The mean r-squared value for the combined "overall" countries dataset is zero, indicating that this dataset has a very poor fit, further suggesting that our model is low quality, and that the SDI does not do a good job at explaining the variability in Murders per 100K. 
 
 ## References:
 
