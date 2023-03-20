@@ -507,13 +507,13 @@ tibbleplot <- tibble(country_sims = sim_r_sq) %>%
   geom_histogram(binwidth = 0.025, fill = colorfilter) +
   labs(x = expression("Simulated"~ R^2),
        y = "",
-       subtitle = "Number of Simulated Models") +
+       subtitle = "Number of Simulated Models",
+       title = glue(countryfilter, " Simulated Models")) +
   theme_bw()
 
 return(tibbleplot)
 }
 
-data_clean
 Rsim(lm_totalcountry, 1000, data_clean, "Overall", "black")
 Rsim(lm_us, 1000, data_us, "United States", "#F8766D")
 Rsim(lm_australia, 1000, data_australia, "Australia", "#A3A500")
