@@ -405,11 +405,12 @@ kable(x = Variability,
 
 ```
 
-Our residual variance for our model (lm_totalcountry) is 7.62. When you then divide the residual variance (7.62) over the response variance (8.25), you get 92.36%. This is the amount of unexplained variability in Murders that is not accounted for by SDI in the model. This indicates that the model is doing a poor job of explaining the variability in the response variable.
+Our residual variance for our model (lm_totalcountry) is 7.62. When dividing the residual variance (7.62) by the response variance (8.25), the result is 92.36%. This is the amount of unexplained variability in Murders that is not accounted for by SDI in the model. This indicates that the model is doing a poor job of explaining the variability in the response variable.
 
-To check this, we also observed the R-squared value, which is the proportion of the variability in our response variable (Murder Rate per 100K in these 5 countries) that is accounted for by our regression model (lm_totalcountry), which came out to be 0.0761. So, 7.61% of the variation in Murders per 100K people in these 5 countries can be explained by the Sustainable Development Index (SDI) for the countries, while the remaining 92.39% is due to other factors or random variation. This further suggests that our model is low quality, and that the SDI does not explain the variability in Murders per 100K very well.
+To verify this, we also observed the R-squared value. R-squared is the proportion of the variability in our response variable (Murder Rate per 100K in these 5 countries) that is accounted for by our regression model (lm_totalcountry), which came out to be 0.0761. This indicates that 7.61% of the variation in Murders per 100K people in these 5 countries can be explained by the Sustainable Development Index (SDI) for the countries, while the remaining 92.39% is due to other factors or random variation. This further suggests that our model is low quality, and that the SDI does not explain the variability in Murders per 100K very well.
 
 ```{r}
+#| fig-height: 3
 noise <- function(x, mean = 0, sd){
   x + rnorm(length(x), 
             mean, 
@@ -455,19 +456,19 @@ SimDistribution(lm_japan, data_japan, 0.2, "Japan", "#E76BF3") +
                                                             size = 11)))
 ```
 
-The SimDistribution function, which uses the linear models created for each country, the datasets created for each country, and a choosen bin size, was used to plot each of the histograms shown above. A noise function, which randomly generates noise using an input (x), mean, and standard deviation (sd), was then used to create the simulated histograms for each country within the SimDistribution function, and plot those as well. The simulated and observed data for each country, as well as overall, are presented side by side in Figure 6. These represent the simulated and observed murder rate per 100K for each country.
+The *SimDistribution* function, which uses the linear models created for each country, the datasets created for each country, and a chosen bin size, was used to plot each of the histograms shown above. A noise function, which randomly generates noise using an input (x), mean, and standard deviation (sd), was then used to create the simulated histograms for each country within the *SimDistribution* function. The simulated and observed data for the countries as individuals and a whole are presented side by side in Figure 6. These represent the simulated and observed murder rate per 100K for each country.
 
-For the overall observed versus overall simulated histograms, one can see that there is a much wider spread in the simulated data, with the mean centered around 3, multiple peaks at -2, 1, 2, 4, and 7, and a slight left skew. The observed data for overall countries has a mean that is concentrated around 1, and few data points around 6-10, creating a right skew.
+For the overall observed versus overall simulated histograms, one can see that there is a much wider spread in the simulated data, with the mean centered around 3, multiple peaks at -2, 1, 2, 4, and 7, and a slight right skew. The observed data for overall countries has a mean that is concentrated around 1, and few data points around 6-10, creating a right skew.
 
 For each individual countries simulated distribution histograms, we see a much smaller spread of data: The simulated US has a mean centered around 7 and slight right skew, Australia having a mean centered around 2, and Germany, Singapore, and Japan having their mean's at 1. These individual simulated histograms help explain why the overall simulated histogram has peaks at 1, 2, and 7.
 
 The observed histograms for each of these countries and the overall countries have smaller spreads around their means, with the observed overall histogram having peaks around 1 and a right skew, and the US having peaks at 6 and 10 with a slight right skew. The observed plots for Australia, Germany, Singapore, and Japan look very similar to their simulated plots, with peaks at 2, 1, 1, and 1, respectively.
 
-From these side by side comparisons of observed versus simulated data, one can observe that for each individual country, the simulated data yields similar results as the observed data. However, for the overall countries, the simulated data might be slightly misleading due to it looking more different from the actual observed histogram.
+From these side by side comparisons of observed versus simulated data, one can observe that for each individual country, the simulated data yields similar results as the observed data. However, for the overall countries, the simulated data may be misleading due to a difference in shape from the actual observed histogram.
 
 ```{r}
+#| fig-height: 4
 #3.2 Done in Basic way according to textbook
-# I don't know how to fix the binding error
 
 sims <- function(lm, nsims){
 countryerror <- sigma(lm)
@@ -525,11 +526,11 @@ Rsim(lm_japan, 1000, data_japan, "Japan", "#E76BF3") +
                                                             size = 11)))
 ```
 
-The above plots are created from simulations to generate visualizations of the distribution of R-squared values for each of the simulated models of murder rates in the specific countries. This is done by first generating simulated data by adding noise to predicted values, in the sims function. The Rsim function then combines this simulated data with the actual country's murder rate data, fitting the country's linear model to the simulated data, and then calculating the r-squared values and plotting it as a histogram. 
+Figure 7 contains plots that are created from the simulated data to generate visualizations of the distribution of R-squared values for each simulated model of murder rates in the specific countries. This is done by first generating simulated data by adding noise to predicted values, in the *sims* function. The *Rsim* function then combines this simulated data with the actual country's murder rate data, fitting the country's linear model to the simulated data, and then calculating the r-squared values and plotting it as a histogram. 
 
-R-squared value are a measure of how well a model fits the data, with values ranging from 0.00 to 1, and higher values indicating a better fit. From the above histograms, one can see that the mean r-squared values vary widely across the different countries, with some having values closer to 1 indicating a good fit, while others have values closer to 0 indicating a poor fit. 
+R-squared values are a measure of how well a model fits the data, with values ranging from 0.00 to 1. Higher values indicate a better fit. From the histograms in Figure 7, one can see that the mean r-squared values vary widely across the different countries, with some having values closer to 1 indicating a good fit, while others have values closer to 0 indicating a poor fit. 
 
-The mean r-squared value for the combined "overall" countries dataset is zero, indicating that this dataset has a very poor fit, further suggesting that our model is low quality, and that the SDI does not do a good job at explaining the variability in Murders per 100K. 
+The mean r-squared value for the combined "overall" countries dataset is zero, indicating that this dataset has a very poor fit, further suggesting that our model is low quality, and that the SDI does not do a good job at explaining the variability in Murders per 100K for the entire selection of countries. 
 
 ## References:
 
